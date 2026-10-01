@@ -117,11 +117,13 @@ export default async function TaskPage({ params }: { params: Promise<{ id: strin
           <Section
             title="Evidence"
             description={
-              t.status === "submitted"
-                ? `Submission ${t.submissionRound}. Items added after submitting count for the next submission.`
-                : d.evidenceStatus.ok
-                  ? "Enough evidence to submit."
-                  : (d.evidenceStatus.reason ?? "Add evidence before submitting.")
+              t.status === "verified" || t.status === "locked"
+                ? `Checked and verified by ${name(t.verifiedBy)}.`
+                : t.status === "submitted"
+                  ? `Submission ${t.submissionRound}. Items added after submitting count for the next submission.`
+                  : d.evidenceStatus.ok
+                    ? "Enough evidence to submit."
+                    : (d.evidenceStatus.reason ?? "Add evidence before submitting.")
             }
           >
             {d.evidence.length ? (
@@ -276,7 +278,9 @@ export default async function TaskPage({ params }: { params: Promise<{ id: strin
                 </ul>
               ) : null}
               {d.can.adjust && pendingOnMe.length === 0 ? (
-                <ActionForm action={requestAdjustmentAction.bind(null, t.id)} className="grid gap-2 sm:grid-cols-2">
+                <details>
+                <summary className="cursor-pointer text-sm font-semibold text-royal">Request an adjustment</summary>
+                <ActionForm action={requestAdjustmentAction.bind(null, t.id)} className="mt-2 grid gap-2 sm:grid-cols-2">
                   <Field label="Change">
                     <select className="field-input" name="kind" defaultValue="factor">
                       <option value="factor">Adjustment factor</option>
@@ -311,6 +315,7 @@ export default async function TaskPage({ params }: { params: Promise<{ id: strin
                     <SubmitButton variant="secondary">Ask partner to approve</SubmitButton>
                   </div>
                 </ActionForm>
+                </details>
               ) : null}
             </Section>
           ) : null}

@@ -86,7 +86,7 @@ export function taskDetail(db: AppDb, taskId: number, memberId: number, now: Dat
       unblock: open && t.status === "blocked",
       submit: open && t.status === "in_progress" && isContributor,
       verify: open && canVerifyTask(db, t, memberId),
-      addEvidence: open && !["locked", "cancelled"].includes(t.status),
+      addEvidence: open && ["planned", "in_progress", "blocked", "submitted"].includes(t.status),
       editPlan: open && p.planStatus === "draft" && ["planned", "proposed", "in_progress", "blocked"].includes(t.status),
       adjust: open && p.planStatus === "locked" && !["locked", "cancelled", "proposed"].includes(t.status),
       dispute: open && t.status === "verified" && !activeDispute && !!windowEnds && now <= windowEnds,

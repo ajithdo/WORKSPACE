@@ -38,7 +38,7 @@ export function SideNav({ items }: { items: NavItem[] }) {
 export function Tabs({ items }: { items: NavItem[] }) {
   const path = usePathname();
   return (
-    <nav aria-label="Project sections" className="-mx-1 flex gap-1 overflow-x-auto border-b border-rule pb-px">
+    <nav aria-label="Project sections" className="-mx-1 flex gap-1 overflow-x-auto border-b border-rule pb-px lg:flex-wrap lg:overflow-visible">
       {items.map((i) => {
         const active = i.href.split("/").length <= 3 ? path === i.href : isActive(path, i.href);
         return (
