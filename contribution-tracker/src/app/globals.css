@@ -1,1 +1,162 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-mukta), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Paper and ink: a working ledger, not a dashboard. */
+  --color-page: #f3f6fa;
+  --color-paper: #ffffff;
+  --color-ink: #1b2a4a;
+  --color-ink-soft: #46567a;
+  --color-ink-faint: #7a879f;
+  --color-rule: #dce3ee;
+  --color-rule-strong: #c2ccdb;
+
+  /* Royal-blue fountain-pen ink for actions. */
+  --color-royal: #2348a8;
+  --color-royal-dark: #1a367f;
+  --color-royal-wash: #eaf0fb;
+
+  /* Bahi-khata red: the margin rule, locks and anything that needs attention. */
+  --color-ledger: #b42318;
+  --color-ledger-wash: #fbeae8;
+
+  --color-verified: #1e7a46;
+  --color-verified-wash: #e5f3eb;
+  --color-waiting: #9a5b00;
+  --color-waiting-wash: #fdf2df;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.55;
+    text-rendering: optimizeLegibility;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-royal);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  h1,
+  h2,
+  h3 {
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+  a {
+    color: inherit;
+  }
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+}
+
+@layer components {
+  /* The signature: a ledger page with the double red margin rule down its left edge. */
+  .ledger-page {
+    background-color: var(--color-paper);
+    background-image: linear-gradient(
+      to right,
+      transparent 18px,
+      var(--color-ledger) 18px,
+      var(--color-ledger) 19px,
+      transparent 19px,
+      transparent 22px,
+      var(--color-ledger) 22px,
+      var(--color-ledger) 23px,
+      transparent 23px
+    );
+    background-repeat: repeat-y;
+    padding-left: 2.5rem;
+  }
+  @media (min-width: 768px) {
+    .ledger-page {
+      background-image: linear-gradient(
+        to right,
+        transparent 28px,
+        var(--color-ledger) 28px,
+        var(--color-ledger) 29px,
+        transparent 29px,
+        transparent 32px,
+        var(--color-ledger) 32px,
+        var(--color-ledger) 33px,
+        transparent 33px
+      );
+      padding-left: 3.5rem;
+    }
+  }
+
+  .ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+  .ledger-table th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--color-ink-soft);
+    padding: 0.5rem 0.75rem 0.4rem;
+    border-bottom: 3px double var(--color-rule-strong);
+    white-space: nowrap;
+  }
+  .ledger-table td {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid var(--color-rule);
+    vertical-align: top;
+  }
+  .ledger-table tr:last-child td {
+    border-bottom: none;
+  }
+  .ledger-table .num {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    border: 1.5px solid currentColor;
+    border-radius: 3px;
+    padding: 0 0.4rem;
+    font-weight: 700;
+    font-size: 0.8rem;
+    line-height: 1.5rem;
+    letter-spacing: 0.02em;
+  }
+
+  .field-input {
+    width: 100%;
+    border: 1px solid var(--color-rule-strong);
+    border-radius: 6px;
+    background: var(--color-paper);
+    padding: 0.45rem 0.65rem;
+    color: var(--color-ink);
+  }
+  .field-input:focus {
+    border-color: var(--color-royal);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-royal-wash);
+  }
+  .field-input[aria-invalid="true"] {
+    border-color: var(--color-ledger);
+  }
+}
