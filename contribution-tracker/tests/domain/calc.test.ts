@@ -172,3 +172,26 @@ describe("calculateContribution — money edge cases", () => {
     expect(JSON.stringify(calculateContribution(i, params))).toBe(JSON.stringify(calculateContribution(i, params)));
   });
 });
+
+describe("calculateContribution — post-lock point corrections", () => {
+  it("adds positive and negative corrections to the member's other points", () => {
+    const r = calculateContribution(
+      input({
+        tasks: [task("V", 10, { A: 1 }), task("S", 10, { B: 1 })],
+        pointAdjustments: [
+          { ref: "adj1", memberId: "A", points: 2 },
+          { ref: "adj2", memberId: "B", points: -3 },
+        ],
+      }),
+      params,
+    );
+    expect(member(r, "A").totalPoints).toBe(12);
+    expect(member(r, "B").totalPoints).toBe(7);
+  });
+
+  it("never lets a member's points go below zero", () => {
+    const r = calculateContribution(input({ tasks: [task("V", 10, { A: 1 })], pointAdjustments: [{ ref: "adj", memberId: "B", points: -5 }] }), params);
+    expect(member(r, "B").totalPoints).toBe(0);
+    expect(r.notes).toContain("negative_points_clamped");
+  });
+});

@@ -450,9 +450,10 @@ export const invoices = sqliteTable(
     projectId: integer("project_id")
       .notNull()
       .references(() => projects.id),
-    number: text("number").notNull().unique(),
-    fyLabel: text("fy_label").notNull(),
-    seq: integer("seq").notNull(),
+    /** Assigned when the invoice is issued, so drafts never leave gaps in the GST series. */
+    number: text("number").unique(),
+    fyLabel: text("fy_label"),
+    seq: integer("seq"),
     type: text("type").notNull(),
     issueDate: text("issue_date").notNull(),
     dueDate: text("due_date").notNull(),

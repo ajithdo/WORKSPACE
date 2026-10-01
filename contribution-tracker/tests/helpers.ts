@@ -1,3 +1,4 @@
+process.env.SCRYPT_N = "1024";
 import { openDb, type AppDb } from "@/db";
 import { members } from "@/db/schema";
 import type { Ctx } from "@/server/context";

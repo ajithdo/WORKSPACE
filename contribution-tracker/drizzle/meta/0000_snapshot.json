@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "02d37136-26cb-4c37-af69-846f7902657a",
+  "id": "200b6e7a-4ee1-43e6-b85e-4213381c258c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "action_items": {
@@ -2868,21 +2868,21 @@
           "name": "number",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "fy_label": {
           "name": "fy_label",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "seq": {
           "name": "seq",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "type": {

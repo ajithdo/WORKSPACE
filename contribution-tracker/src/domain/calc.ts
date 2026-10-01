@@ -45,6 +45,8 @@ export interface CalcInput {
   tasks: CalcTask[];
   communicationAwards: CalcAward[];
   origination: { memberId: string; plannedTotal: number } | null;
+  /** Post-lock corrections agreed by both partners; may be negative; counted as "other" points. */
+  pointAdjustments?: CalcAward[];
   revenuePaise: number;
   expenses: CalcExpense[];
 }
@@ -132,6 +134,10 @@ function validate(input: CalcInput) {
     assertFinite(a.points, `Communication ${a.ref} points`);
   }
   if (input.origination) known(input.origination.memberId, "Origination");
+  for (const a of input.pointAdjustments ?? []) {
+    known(a.memberId, `Adjustment ${a.ref}`);
+    assertFinite(a.points, `Adjustment ${a.ref} points`);
+  }
   if (!Number.isSafeInteger(input.revenuePaise) || input.revenuePaise < 0) throw new Error("Revenue must be a non-negative whole number of paise");
   for (const e of input.expenses) {
     if (!Number.isSafeInteger(e.amountPaise) || e.amountPaise < 0) throw new Error(`Expense ${e.ref} must be a non-negative whole number of paise`);
@@ -166,6 +172,14 @@ export function calculateContribution(input: CalcInput, params: CalcParams): Cal
   for (const a of input.communicationAwards) at(a.memberId).comm += a.points;
   // Step 4: origination credit counts as sales.
   if (input.origination) at(input.origination.memberId).sales += params.origination_credit_pct * input.origination.plannedTotal;
+  // Post-lock corrections (both partners approved); a member's points never go below zero.
+  for (const a of input.pointAdjustments ?? []) at(a.memberId).other += a.points;
+  for (const m of input.members) {
+    if (at(m).other < 0) {
+      at(m).other = 0;
+      if (!notes.includes("negative_points_clamped")) notes.push("negative_points_clamped");
+    }
+  }
 
   const rawPoints: Record<string, KindPoints> = {};
   for (const m of input.members) rawPoints[m] = { ...at(m) };

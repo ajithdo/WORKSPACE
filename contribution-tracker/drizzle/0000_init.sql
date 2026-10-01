@@ -382,9 +382,9 @@ CREATE UNIQUE INDEX `handover_project_code` ON `handover_items` (`project_id`,`c
 CREATE TABLE `invoices` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`project_id` integer NOT NULL,
-	`number` text NOT NULL,
-	`fy_label` text NOT NULL,
-	`seq` integer NOT NULL,
+	`number` text,
+	`fy_label` text,
+	`seq` integer,
 	`type` text NOT NULL,
 	`issue_date` text NOT NULL,
 	`due_date` text NOT NULL,
