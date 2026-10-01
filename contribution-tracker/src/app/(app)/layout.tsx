@@ -18,8 +18,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     { href: "/audit", label: "Audit log" },
   ];
   return (
-    <div className="md:grid md:min-h-dvh md:grid-cols-[15rem_1fr]">
-      <aside className="bg-ink text-white md:sticky md:top-0 md:h-dvh">
+    <div className="md:grid md:min-h-dvh md:grid-cols-[15rem_1fr] print:block">
+      <aside className="bg-ink text-white md:sticky md:top-0 md:h-dvh print:hidden">
         <details className="group md:hidden" open={false}>
           <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3">
             <span className="font-bold">{studio?.name ?? "Studio"}</span>
