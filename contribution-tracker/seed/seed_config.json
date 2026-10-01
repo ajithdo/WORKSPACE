@@ -1,0 +1,1441 @@
+{
+ "version": "1.0",
+ "generated": "2026-09-28",
+ "categories": [
+  {
+   "code": "A",
+   "name": "Lead Generation",
+   "phase": "presales",
+   "is_communication": false,
+   "is_sales": true,
+   "is_business_level": false
+  },
+  {
+   "code": "B",
+   "name": "Client Outreach",
+   "phase": "presales",
+   "is_communication": false,
+   "is_sales": true,
+   "is_business_level": false
+  },
+  {
+   "code": "C",
+   "name": "Sales",
+   "phase": "presales",
+   "is_communication": false,
+   "is_sales": true,
+   "is_business_level": false
+  },
+  {
+   "code": "D",
+   "name": "Discovery",
+   "phase": "discovery",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "E",
+   "name": "Requirements Gathering",
+   "phase": "discovery",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "F",
+   "name": "Scope Definition",
+   "phase": "contract",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "G",
+   "name": "Proposal/Quotation",
+   "phase": "contract",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "H",
+   "name": "Contract/Agreement",
+   "phase": "contract",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "I",
+   "name": "Payment/Invoice",
+   "phase": "contract",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "J",
+   "name": "Project Setup",
+   "phase": "kickoff",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "K",
+   "name": "Client Communication",
+   "phase": "throughout",
+   "is_communication": true,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "L",
+   "name": "Research",
+   "phase": "research",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "M",
+   "name": "Competitor Research",
+   "phase": "research",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "N",
+   "name": "Brand Assets",
+   "phase": "content",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "O",
+   "name": "Content Collection",
+   "phase": "content",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "P",
+   "name": "Copywriting",
+   "phase": "content",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "Q",
+   "name": "UX",
+   "phase": "design",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "R",
+   "name": "Wireframes",
+   "phase": "design",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "S",
+   "name": "UI Design",
+   "phase": "design",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "T",
+   "name": "Design System",
+   "phase": "design",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "U",
+   "name": "Client Design Approval",
+   "phase": "design",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "V",
+   "name": "Frontend Development",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "W",
+   "name": "Backend Development",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "X",
+   "name": "Database",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "Y",
+   "name": "Authentication",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "Z",
+   "name": "APIs",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AA",
+   "name": "Third-party Integrations",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AB",
+   "name": "Forms",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AC",
+   "name": "Email",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AD",
+   "name": "CMS",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AE",
+   "name": "Admin Dashboard",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AF",
+   "name": "E-commerce",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AG",
+   "name": "Booking Systems",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AH",
+   "name": "Payments",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AI",
+   "name": "SEO",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AJ",
+   "name": "Analytics",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AK",
+   "name": "Accessibility",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AL",
+   "name": "Performance",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AM",
+   "name": "Security",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AN",
+   "name": "Responsive Design",
+   "phase": "qa",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AO",
+   "name": "Cross-browser Testing",
+   "phase": "qa",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AP",
+   "name": "QA",
+   "phase": "qa",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AQ",
+   "name": "Bug Fixing",
+   "phase": "qa",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AR",
+   "name": "Client Review",
+   "phase": "review",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AS",
+   "name": "Revisions",
+   "phase": "review",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AT",
+   "name": "Scope Changes",
+   "phase": "review",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AU",
+   "name": "Deployment",
+   "phase": "launch",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AV",
+   "name": "Domain",
+   "phase": "launch",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AW",
+   "name": "DNS",
+   "phase": "launch",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AX",
+   "name": "Hosting",
+   "phase": "launch",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AY",
+   "name": "SSL/HTTPS",
+   "phase": "launch",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "AZ",
+   "name": "Production Environment",
+   "phase": "launch",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BA",
+   "name": "Launch",
+   "phase": "launch",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BB",
+   "name": "Post-launch Testing",
+   "phase": "launch",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BC",
+   "name": "Handover",
+   "phase": "handover",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BD",
+   "name": "Documentation",
+   "phase": "handover",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BE",
+   "name": "Training",
+   "phase": "handover",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BF",
+   "name": "Final Payment",
+   "phase": "handover",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BG",
+   "name": "Ownership Transfer",
+   "phase": "handover",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BH",
+   "name": "Maintenance",
+   "phase": "maintenance",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BI",
+   "name": "Support",
+   "phase": "maintenance",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BJ",
+   "name": "Project Closure",
+   "phase": "closure",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BK",
+   "name": "Legal & Compliance Pages (added)",
+   "phase": "content",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BL",
+   "name": "Backup & Recovery (added)",
+   "phase": "launch",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BM",
+   "name": "Localisation (added)",
+   "phase": "development",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BN",
+   "name": "Internal Finance & Tax Admin (added)",
+   "phase": "closure",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": false
+  },
+  {
+   "code": "BO",
+   "name": "Partner Governance (added)",
+   "phase": "studio",
+   "is_communication": false,
+   "is_sales": false,
+   "is_business_level": true
+  }
+ ],
+ "phases": [
+  "presales",
+  "discovery",
+  "contract",
+  "kickoff",
+  "research",
+  "content",
+  "design",
+  "development",
+  "qa",
+  "review",
+  "launch",
+  "handover",
+  "closure",
+  "maintenance",
+  "studio",
+  "throughout"
+ ],
+ "task_status": [
+  "proposed",
+  "planned",
+  "in_progress",
+  "blocked",
+  "submitted",
+  "verified",
+  "locked",
+  "cancelled"
+ ],
+ "task_transitions": [
+  [
+   "proposed",
+   "planned"
+  ],
+  [
+   "proposed",
+   "cancelled"
+  ],
+  [
+   "planned",
+   "in_progress"
+  ],
+  [
+   "planned",
+   "cancelled"
+  ],
+  [
+   "in_progress",
+   "blocked"
+  ],
+  [
+   "blocked",
+   "in_progress"
+  ],
+  [
+   "in_progress",
+   "submitted"
+  ],
+  [
+   "submitted",
+   "verified"
+  ],
+  [
+   "submitted",
+   "in_progress"
+  ],
+  [
+   "verified",
+   "locked"
+  ]
+ ],
+ "client_approval_status": [
+  "not_required",
+  "pending",
+  "approved",
+  "changes_requested",
+  "deemed_approved",
+  "rejected"
+ ],
+ "approval_channels": [
+  "email",
+  "signed_pdf",
+  "in_app",
+  "whatsapp_confirmed_by_email"
+ ],
+ "plan_status": [
+  "draft",
+  "awaiting_partner",
+  "locked"
+ ],
+ "adjustment_status": [
+  "requested",
+  "approved",
+  "disputed"
+ ],
+ "project_close_status": [
+  "open",
+  "closing",
+  "awaiting_partner",
+  "closed_locked"
+ ],
+ "evidence_types": [
+  {
+   "code": "git_commit",
+   "strength": "strong"
+  },
+  {
+   "code": "pull_request",
+   "strength": "strong"
+  },
+  {
+   "code": "deployment",
+   "strength": "strong"
+  },
+  {
+   "code": "release_tag",
+   "strength": "strong"
+  },
+  {
+   "code": "client_approval",
+   "strength": "strong"
+  },
+  {
+   "code": "signed_document",
+   "strength": "strong"
+  },
+  {
+   "code": "email_sent",
+   "strength": "strong"
+  },
+  {
+   "code": "meeting_notes_sent",
+   "strength": "strong"
+  },
+  {
+   "code": "test_report",
+   "strength": "strong"
+  },
+  {
+   "code": "scan_report",
+   "strength": "strong"
+  },
+  {
+   "code": "invoice",
+   "strength": "strong"
+  },
+  {
+   "code": "bank_reference",
+   "strength": "strong"
+  },
+  {
+   "code": "dns_lookup",
+   "strength": "strong"
+  },
+  {
+   "code": "url_live",
+   "strength": "strong"
+  },
+  {
+   "code": "design_file_link",
+   "strength": "medium"
+  },
+  {
+   "code": "document_link",
+   "strength": "medium"
+  },
+  {
+   "code": "spreadsheet",
+   "strength": "medium"
+  },
+  {
+   "code": "meeting_record",
+   "strength": "medium"
+  },
+  {
+   "code": "bug_ticket",
+   "strength": "medium"
+  },
+  {
+   "code": "crawl_report",
+   "strength": "medium"
+  },
+  {
+   "code": "config_record",
+   "strength": "medium"
+  },
+  {
+   "code": "screen_recording",
+   "strength": "medium"
+  },
+  {
+   "code": "screenshot",
+   "strength": "weak"
+  },
+  {
+   "code": "document_file",
+   "strength": "weak"
+  },
+  {
+   "code": "receipt",
+   "strength": "weak"
+  },
+  {
+   "code": "other",
+   "strength": "weak"
+  }
+ ],
+ "communication_types": [
+  {
+   "code": "initial_call",
+   "name": "Initial phone call",
+   "lead_points": 1,
+   "second_attendee_points": 0,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "discovery_call",
+   "name": "Discovery call/meeting",
+   "lead_points": 3,
+   "second_attendee_points": 2,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "video_meeting",
+   "name": "General video meeting",
+   "lead_points": 1,
+   "second_attendee_points": 1,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "design_discussion",
+   "name": "Design presentation/discussion",
+   "lead_points": 2,
+   "second_attendee_points": 1,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "requirements_clarification",
+   "name": "Requirements clarification",
+   "lead_points": 1,
+   "second_attendee_points": 0,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "progress_update",
+   "name": "Weekly progress update",
+   "lead_points": 1,
+   "second_attendee_points": 0,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "feedback_call",
+   "name": "Feedback walkthrough",
+   "lead_points": 2,
+   "second_attendee_points": 1,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "revision_discussion",
+   "name": "Revision discussion",
+   "lead_points": 1,
+   "second_attendee_points": 0,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "scope_change_discussion",
+   "name": "Scope-change discussion",
+   "lead_points": 2,
+   "second_attendee_points": 1,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "pricing_negotiation",
+   "name": "Pricing negotiation",
+   "lead_points": 2,
+   "second_attendee_points": 1,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "payment_followup",
+   "name": "Payment follow-up (per escalation step)",
+   "lead_points": 1,
+   "second_attendee_points": 0,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "deployment_discussion",
+   "name": "Deployment/launch planning",
+   "lead_points": 1,
+   "second_attendee_points": 1,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "final_approval",
+   "name": "Final approval",
+   "lead_points": 1,
+   "second_attendee_points": 0,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "handover_meeting",
+   "name": "Handover meeting",
+   "lead_points": 2,
+   "second_attendee_points": 2,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  },
+  {
+   "code": "support_contact",
+   "name": "Post-launch support contact",
+   "lead_points": 0,
+   "second_attendee_points": 0,
+   "required_fields": [
+    "occurred_at",
+    "channel",
+    "lead_member_id",
+    "summary"
+   ],
+   "points_condition": "summary AND (decisions OR action_items) AND evidence(meeting_record|meeting_notes_sent)"
+  }
+ ],
+ "communication_channels": [
+  "phone",
+  "email",
+  "whatsapp",
+  "video",
+  "in_person"
+ ],
+ "file_categories": [
+  {
+   "code": "01_contract",
+   "contents": "proposal, quotation, contract, SOW, assignment deed"
+  },
+  {
+   "code": "02_brief",
+   "contents": "questionnaire, discovery summary, requirements, sitemap"
+  },
+  {
+   "code": "03_content",
+   "contents": "text, images, videos, media rights and licences"
+  },
+  {
+   "code": "04_design",
+   "contents": "wireframes, UI files and exports, design approvals"
+  },
+  {
+   "code": "05_dev",
+   "contents": "README, API docs, configs without secrets"
+  },
+  {
+   "code": "06_qa",
+   "contents": "test reports, scans, bug exports"
+  },
+  {
+   "code": "07_launch",
+   "contents": "launch checklists, DNS exports, deploy records"
+  },
+  {
+   "code": "08_handover",
+   "contents": "account register, licence register, guides, confirmations"
+  },
+  {
+   "code": "09_finance",
+   "contents": "invoices, receipts, bills, TDS certificates"
+  },
+  {
+   "code": "10_comms",
+   "contents": "meeting notes, approvals, change requests"
+  },
+  {
+   "code": "11_internal",
+   "contents": "estimates, retrospectives, contribution statements"
+  }
+ ],
+ "milestones": [
+  {
+   "code": "M0",
+   "name": "Lead qualified",
+   "hard_gate": false,
+   "complete_when": [
+    "C-02"
+   ]
+  },
+  {
+   "code": "M1",
+   "name": "Requirements signed",
+   "hard_gate": false,
+   "complete_when": [
+    "E-07"
+   ]
+  },
+  {
+   "code": "M2",
+   "name": "Contract and advance (Gate 1)",
+   "hard_gate": true,
+   "complete_when": [
+    "H-05",
+    "I-02"
+   ],
+   "payment": "advance",
+   "blocks_phases": [
+    "research",
+    "content",
+    "design",
+    "development",
+    "qa",
+    "review",
+    "launch",
+    "handover",
+    "closure"
+   ]
+  },
+  {
+   "code": "M3",
+   "name": "Kickoff complete",
+   "hard_gate": false,
+   "complete_when": [
+    "J-07",
+    "J-08"
+   ]
+  },
+  {
+   "code": "M4",
+   "name": "Content complete",
+   "hard_gate": false,
+   "complete_when": [
+    "P-05"
+   ]
+  },
+  {
+   "code": "M5",
+   "name": "Design approved (Gate 2)",
+   "hard_gate": true,
+   "complete_when": [
+    "U-04"
+   ],
+   "payment": "design_milestone_optional",
+   "blocks_tasks": [
+    "V-11",
+    "V-12"
+   ]
+  },
+  {
+   "code": "M6",
+   "name": "Staging ready for review",
+   "hard_gate": false,
+   "complete_when": [
+    "AP-02",
+    "AP-05"
+   ]
+  },
+  {
+   "code": "M7",
+   "name": "Final approval (Gate 3)",
+   "hard_gate": true,
+   "complete_when": [
+    "BA-02"
+   ],
+   "blocks_tasks": [
+    "BA-03"
+   ]
+  },
+  {
+   "code": "M8",
+   "name": "Live",
+   "hard_gate": false,
+   "complete_when": [
+    "BA-03",
+    "BB-01",
+    "BB-02"
+   ]
+  },
+  {
+   "code": "M9",
+   "name": "Final payment (Gate 4)",
+   "hard_gate": true,
+   "complete_when": [
+    "BF-02"
+   ],
+   "payment": "final",
+   "blocks_categories": [
+    "BG"
+   ]
+  },
+  {
+   "code": "M10",
+   "name": "Ownership transferred",
+   "hard_gate": false,
+   "complete_when": [
+    "BG-09"
+   ]
+  },
+  {
+   "code": "M11",
+   "name": "Project closed",
+   "hard_gate": false,
+   "complete_when": [
+    "BJ-02",
+    "BJ-03",
+    "BJ-04"
+   ]
+  },
+  {
+   "code": "M12",
+   "name": "Maintenance active",
+   "hard_gate": false,
+   "complete_when": [
+    "BH-01"
+   ],
+   "payment": "amc"
+  }
+ ],
+ "calculation": {
+  "reserve_pct": 0.1,
+  "base_share_pct": 0.2,
+  "pool_pct": 0.8,
+  "communication_cap_pct": 0.2,
+  "sales_cap_pct": 0.1,
+  "micro_task_points_threshold": 1,
+  "micro_task_cap_pct": 0.25,
+  "origination_credit_pct": 0.05,
+  "adjustment_min": 0.5,
+  "adjustment_max": 1.5,
+  "own_defect_fix_points": 0,
+  "auto_approve_hours": 72,
+  "dispute_window_days": 7,
+  "dispute_default_resolution_days": 14,
+  "distribute_tds_credit": false,
+  "complexity_factor": {
+   "Low": 1.0,
+   "Medium": 1.25,
+   "High": 1.5
+  },
+  "evidence_rule": {
+   "strong_required_above_points": 3,
+   "min_strength_otherwise": "medium"
+  }
+ },
+ "dispute_reason_codes": [
+  "not_done",
+  "insufficient_evidence",
+  "wrong_owner_share",
+  "points_inflated",
+  "duplicate_claim",
+  "quality_rework_needed",
+  "expense_not_business",
+  "outside_scope",
+  "other"
+ ],
+ "dispute_status": [
+  "open",
+  "in_discussion",
+  "resolved",
+  "escalated"
+ ],
+ "dispute_resolutions": [
+  "accept",
+  "change_shares",
+  "change_adjustment",
+  "reject_zero",
+  "split_50_50"
+ ],
+ "invoice_types": [
+  "advance",
+  "milestone",
+  "final",
+  "change_request",
+  "amc"
+ ],
+ "invoice_status": [
+  "draft",
+  "sent",
+  "part_paid",
+  "paid",
+  "overdue",
+  "cancelled"
+ ],
+ "payment_modes": [
+  "bank",
+  "upi",
+  "card",
+  "cheque",
+  "cash"
+ ],
+ "tds_rates": {
+  "professional": 0.1,
+  "technical": 0.02,
+  "none": 0.0
+ },
+ "gst_defaults": {
+  "rate": 0.18,
+  "sac": "998314"
+ },
+ "change_request_status": [
+  "logged",
+  "assessed",
+  "quoted",
+  "approved",
+  "declined",
+  "done",
+  "invoiced"
+ ],
+ "handover_item_status": [
+  "not_applicable",
+  "pending",
+  "transferred",
+  "verified_by_client"
+ ],
+ "developer_access_values": [
+  "removed",
+  "reduced_for_amc",
+  "retained_with_reason"
+ ],
+ "handover_items": [
+  {
+   "code": "domain",
+   "should_own": "client (registrant, own registrar account)",
+   "transfer": "register in client account or push/transfer with auth code; MFA, lock, auto-renew"
+  },
+  {
+   "code": "dns",
+   "should_own": "client",
+   "transfer": "zone in client-owned account; export before/after"
+  },
+  {
+   "code": "hosting",
+   "should_own": "client (account + billing)",
+   "transfer": "transfer ownership; remove or downgrade studio"
+  },
+  {
+   "code": "cloud_account",
+   "should_own": "client organisation",
+   "transfer": "transfer projects/billing; delete studio IAM users"
+  },
+  {
+   "code": "repository",
+   "should_own": "client org/account",
+   "transfer": "transfer; remove studio collaborators; rotate deploy keys/secrets"
+  },
+  {
+   "code": "source_code",
+   "should_own": "client (bespoke, by assignment)",
+   "transfer": "tagged release + archive"
+  },
+  {
+   "code": "database",
+   "should_own": "client hosting/cloud",
+   "transfer": "stays in client account; backup copy"
+  },
+  {
+   "code": "database_credentials",
+   "should_own": "client",
+   "transfer": "rotate all; host secret store"
+  },
+  {
+   "code": "storage",
+   "should_own": "client",
+   "transfer": "private buckets; rotate keys"
+  },
+  {
+   "code": "business_email",
+   "should_own": "client tenant",
+   "transfer": "client super-admin; remove studio"
+  },
+  {
+   "code": "smtp",
+   "should_own": "client account",
+   "transfer": "rotate API key; verify domain"
+  },
+  {
+   "code": "api_keys",
+   "should_own": "client accounts",
+   "transfer": "recreate/rotate; restrict"
+  },
+  {
+   "code": "third_party_services",
+   "should_own": "client",
+   "transfer": "transfer ownership and billing"
+  },
+  {
+   "code": "analytics",
+   "should_own": "client (Administrator)",
+   "transfer": "move property if needed; remove/downgrade studio"
+  },
+  {
+   "code": "search_console",
+   "should_own": "client (verified owner)",
+   "transfer": "remove studio verification tokens"
+  },
+  {
+   "code": "business_profiles",
+   "should_own": "client (primary owner)",
+   "transfer": "transfer primary ownership"
+  },
+  {
+   "code": "cms",
+   "should_own": "client admin",
+   "transfer": "named admins; delete shared/seed admins"
+  },
+  {
+   "code": "admin_accounts",
+   "should_own": "client",
+   "transfer": "named accounts; delete seed admin"
+  },
+  {
+   "code": "payment_gateway",
+   "should_own": "client (merchant KYC)",
+   "transfer": "remove studio team member; rotate keys if seen"
+  },
+  {
+   "code": "forms",
+   "should_own": "client inbox/CRM",
+   "transfer": "confirm destinations"
+  },
+  {
+   "code": "backups",
+   "should_own": "client storage",
+   "transfer": "backup job + off-site copy in client account"
+  },
+  {
+   "code": "ssl",
+   "should_own": "host/CDN in client account",
+   "transfer": "auto-renew verified"
+  },
+  {
+   "code": "cdn",
+   "should_own": "client account",
+   "transfer": "transfer; rotate tokens"
+  },
+  {
+   "code": "environment_variables",
+   "should_own": "host secret store",
+   "transfer": "rotate values studio knew; names in README"
+  },
+  {
+   "code": "documentation",
+   "should_own": "client",
+   "transfer": "README, user guide, registers delivered"
+  },
+  {
+   "code": "design_files",
+   "should_own": "client",
+   "transfer": "transfer file or deliver source + exports"
+  },
+  {
+   "code": "images_videos",
+   "should_own": "client",
+   "transfer": "originals + optimised delivered"
+  },
+  {
+   "code": "fonts",
+   "should_own": "licensee per licence (usually client)",
+   "transfer": "licence in client name where required"
+  },
+  {
+   "code": "licences",
+   "should_own": "client",
+   "transfer": "themes/plugins/stock licensed to client"
+  },
+  {
+   "code": "plugins_dependencies",
+   "should_own": "part of code",
+   "transfer": "lockfile + plugin list"
+  },
+  {
+   "code": "certificates",
+   "should_own": "client",
+   "transfer": "re-issue in client name if needed"
+  },
+  {
+   "code": "renewals",
+   "should_own": "client",
+   "transfer": "renewal register delivered"
+  },
+  {
+   "code": "subscriptions",
+   "should_own": "client billing",
+   "transfer": "move all recurring charges to client"
+  },
+  {
+   "code": "maintenance_arrangement",
+   "should_own": "written AMC or written no-AMC",
+   "transfer": "signed"
+  }
+ ],
+ "closure_checklist": [
+  "All tasks verified or cancelled with reason",
+  "No open disputes",
+  "All invoices paid or written off with reason; final settlement statement generated",
+  "TDS certificates recorded or marked pending",
+  "Expenses reimbursed",
+  "Handover checklist complete (M10)",
+  "Retrospective recorded; calibration suggestions captured",
+  "Contribution snapshot approved by both and locked with hash",
+  "Distribution paid and recorded",
+  "Files archived with retention dates",
+  "Testimonial/portfolio permission status recorded",
+  "Internal vault items and temporary accounts removed"
+ ],
+ "owner_roles": [
+  "Sales",
+  "PM",
+  "Design",
+  "Content",
+  "FE",
+  "BE",
+  "DevOps",
+  "QA",
+  "Either"
+ ],
+ "project_types": {
+  "brochure": "tasks where in_standard_project == 'Yes'",
+  "cms": "brochure + AD-*",
+  "ecommerce": "cms + AF-*, AH-*, BK-04",
+  "booking": "brochure + AG-*",
+  "multilingual_addon": "BM-*"
+ }
+}
