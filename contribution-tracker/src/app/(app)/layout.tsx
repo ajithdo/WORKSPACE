@@ -12,6 +12,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const inboxCount = inboxFor(db, member.id, new Date()).length;
   const nav = [
     { href: "/", label: "Needs your action", count: inboxCount },
+    { href: "/my-work", label: "My work" },
     { href: "/projects", label: "Projects" },
     { href: "/summary", label: "Year at a glance" },
     { href: "/library", label: "Task library" },

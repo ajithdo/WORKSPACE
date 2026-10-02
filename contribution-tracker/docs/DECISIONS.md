@@ -120,8 +120,17 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
     - Evidence goes through the normal secret scan and is never duplicated on redelivery. It never submits or verifies anything.
     - Off unless the secret is set.
 
+33. **My work.** Each partner's own tasks across open projects, grouped by what to do next:
+    - sent back by the partner, with the reason;
+    - in progress;
+    - blocked;
+    - ready to start, in phase order;
+    - waiting on a gate, naming the missing task.
+
+    The inbox stays the list of things to check for the other partner.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens
 
-`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/report` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/invoice/[invoiceId]` · `…/quote` · `…/assistant` · `/summary` · `/guide` · `/search` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.
+`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/report` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/invoice/[invoiceId]` · `…/quote` · `…/assistant` · `/my-work` · `/summary` · `/guide` · `/search` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.
