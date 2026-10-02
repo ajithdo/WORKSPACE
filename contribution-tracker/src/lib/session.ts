@@ -1,8 +1,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getDb } from "@/db";
+import { dataDir, getDb } from "@/db";
 import { isSetUp, memberForSession, type MemberRow } from "@/server/auth";
 import type { Ctx } from "@/server/context";
+import { maybeAutoBackup } from "@/server/backup";
 import { runDueJobsThrottled } from "@/server/jobs";
 
 export const SESSION_COOKIE = "ct_session";
@@ -19,6 +20,7 @@ export async function requireMember(): Promise<MemberRow> {
   const m = await currentMember();
   if (!m) redirect("/login");
   runDueJobsThrottled({ db, actorId: null, now: new Date() });
+  maybeAutoBackup(db, dataDir());
   return m;
 }
 

@@ -44,6 +44,7 @@ Sign in as `asha@studio.test` / `demo password one`, or as `bala@studio.test` / 
 
 | What | How |
 |---|---|
+| Automatic daily copy | Made in `DATA_DIR/backups` on the first page view each day. The newest 14 are kept (`AUTO_BACKUP_DAYS`). It protects against mistakes, not disk loss, so still copy the folder off the server. |
 | Database copy (safe while running) and JSON export | Settings → Backups, or `DATA_DIR=… npm run backup [-- dest]` |
 | Uploaded evidence | Copy `DATA_DIR/files`. Files are never changed or deleted, only added. |
 | Audit chain check | Audit log → "Check integrity", or `DATA_DIR=… npm run verify:audit` (non-zero exit if tampered) |

@@ -2,11 +2,12 @@ import { desc } from "drizzle-orm";
 import { ActionButton, ActionForm, SubmitButton } from "@/components/forms";
 import { Field, formatDate, KeyValue, Money, Note, PageHeader, Pill, Section } from "@/components/ui";
 import { parseStudioConfig } from "@/domain/config";
-import { getDb } from "@/db";
+import { dataDir, getDb } from "@/db";
 import { configVersions, reserveLedger } from "@/db/schema";
 import { INDIAN_STATES } from "@/lib/states";
 import { requireMember } from "@/lib/session";
 import { accountYears } from "@/server/accounts";
+import { latestAutoBackup } from "@/server/backup";
 import { hasVoted } from "@/server/approvals";
 import { listMembers } from "@/server/auth";
 import { reserveBalance } from "@/server/finance";
@@ -53,6 +54,7 @@ export default async function SettingsPage() {
   const me = await requireMember();
   const db = getDb();
   const years = accountYears(db);
+  const autoCopy = latestAutoBackup(dataDir());
   const studio = getStudio(db);
   const members = listMembers(db);
   const versions = db.select().from(configVersions).orderBy(desc(configVersions.version)).all();
@@ -329,6 +331,13 @@ export default async function SettingsPage() {
             Download all data as JSON
           </a>
         </div>
+        <p className="mt-3 text-sm">
+          {autoCopy
+            ? `Automatic daily copy: last made ${formatDate(autoCopy.at.slice(0, 10))} (${autoCopy.count} kept in the backups folder).`
+            : process.env.AUTO_BACKUP_DAYS === "0"
+              ? "Automatic daily copies are turned off (AUTO_BACKUP_DAYS=0)."
+              : "Automatic daily copies start with the first page you open each day."}
+        </p>
         <p className="mt-2 text-sm text-ink-soft">Uploaded files are not inside these downloads; back up the files folder too (see README, “Backups”).</p>
       </Section>
     </>
