@@ -5,7 +5,7 @@ import { z } from "zod";
 import { analyseSite, type SiteCheck } from "@/domain/siteRules";
 import { aiReports, projects, taskInstances, taskTemplates } from "@/db/schema";
 import type { Ctx } from "./context";
-import { iso } from "./context";
+import { iso, isoDate } from "./context";
 import { assertProjectMember, assertProjectOpen, audit, contributionsOf, loadProject, projectConfig, requireActor } from "./common";
 import { DomainError } from "./errors";
 import { addEvidence } from "./evidence";
@@ -153,7 +153,7 @@ export function aiDailyLimit(): number {
 export function assertAiBudget(ctx: Ctx) {
   const limit = aiDailyLimit();
   if (!limit) return;
-  const since = iso(ctx.now).slice(0, 10) + "T00:00:00.000Z";
+  const since = new Date(`${isoDate(ctx.now)}T00:00:00+05:30`).toISOString(); // midnight in India
   const used = ctx.db
     .select({ id: aiReports.id })
     .from(aiReports)

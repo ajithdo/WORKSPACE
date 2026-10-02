@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import type { AppDb } from "@/db";
 import { contributionSnapshots, distributions, expenses, invoices, members, payments, projects, reserveLedger } from "@/db/schema";
 import { financialYearLabel } from "@/domain/money";
+import { isoDate } from "./context";
 
 export interface MemberYear {
   memberId: number;
@@ -17,7 +18,8 @@ export interface MemberYear {
 
 /** One financial year across every project: what each partner earned and what the studio billed and received. */
 export function yearSummary(db: AppDb, fy: string) {
-  const inFy = (d: string | null | undefined) => !!d && financialYearLabel(d.slice(0, 10)) === fy;
+  // Timestamps and plain dates alike are placed on the India calendar.
+  const inFy = (d: string | null | undefined) => !!d && financialYearLabel(isoDate(new Date(d))) === fy;
   const snaps = new Map(db.select().from(contributionSnapshots).all().map((s) => [s.id, s]));
   const byMember = new Map<number, MemberYear & { projectIds: Set<number> }>();
   for (const m of db.select().from(members).all()) {
@@ -67,6 +69,6 @@ export function summaryYears(db: AppDb, today: string): string[] {
   const years = new Set<string>([financialYearLabel(today)]);
   for (const p of db.select({ d: payments.receivedDate }).from(payments).all()) years.add(financialYearLabel(p.d));
   for (const i of db.select({ d: invoices.issueDate }).from(invoices).all()) years.add(financialYearLabel(i.d));
-  for (const s of db.select({ d: contributionSnapshots.lockedAt }).from(contributionSnapshots).all()) if (s.d) years.add(financialYearLabel(s.d.slice(0, 10)));
+  for (const s of db.select({ d: contributionSnapshots.lockedAt }).from(contributionSnapshots).all()) if (s.d) years.add(financialYearLabel(isoDate(new Date(s.d))));
   return [...years].sort().reverse();
 }

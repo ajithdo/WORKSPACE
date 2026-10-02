@@ -4,6 +4,7 @@ import { clientApprovals, invoices, taskInstances } from "@/db/schema";
 import { formatINR } from "@/domain/money";
 import { readableDate } from "@/domain/reminders";
 import { loadProject } from "./common";
+import { isoDate } from "./context";
 import { isSettled } from "./finance";
 import { projectMilestones } from "./milestones";
 import { projectHeader } from "./queries";
@@ -29,11 +30,11 @@ export function progressReport(db: AppDb, projectId: number, from: string, to: s
   const { project: p, client } = projectHeader(db, projectId);
   const tasks = db.select().from(taskInstances).where(eq(taskInstances.projectId, projectId)).all();
   const visible = tasks.filter((t) => !INTERNAL_PHASES.has(t.phase) && !t.isSales && !t.isBusinessLevel && !t.isCommunication);
-  const inRange = (d: string | null) => !!d && d.slice(0, 10) >= from && d.slice(0, 10) <= to;
+  const inRange = (d: string | null) => !!d && isoDate(new Date(d)) >= from && isoDate(new Date(d)) <= to;
   const done = visible
     .filter((t) => (t.status === "verified" || t.status === "locked") && inRange(t.verifiedAt))
     .sort((a, b) => (a.verifiedAt ?? "").localeCompare(b.verifiedAt ?? ""))
-    .map((t) => ({ code: t.code, name: t.name, at: t.verifiedAt!.slice(0, 10) }));
+    .map((t) => ({ code: t.code, name: t.name, at: isoDate(new Date(t.verifiedAt!)) }));
   const inProgress = visible.filter((t) => t.status === "in_progress" || t.status === "submitted").map((t) => ({ code: t.code, name: t.name }));
 
   const waitingOnClient: string[] = [];
