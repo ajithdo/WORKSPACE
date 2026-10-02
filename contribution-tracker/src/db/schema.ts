@@ -184,6 +184,7 @@ export const projects = sqliteTable("projects", {
   deemedAcceptanceClause: bool("deemed_acceptance_clause").notNull().default(false),
   deemedAcceptanceDays: integer("deemed_acceptance_days"),
   paymentSchedule: text("payment_schedule", { mode: "json" }).$type<PaymentScheduleEntry[]>().notNull(),
+  siteUrls: text("site_urls", { mode: "json" }).$type<{ local?: string; staging?: string; live?: string }>().notNull().default({}),
   notes: text("notes").notNull().default(""),
   createdBy: integer("created_by").references(() => members.id),
   createdAt: createdAt(),
@@ -782,4 +783,22 @@ export const auditLog = sqliteTable(
     hash: text("hash").notNull(),
   },
   (t) => [index("audit_project").on(t.projectId), index("audit_entity").on(t.entityType, t.entityId)],
+);
+
+/** Results of AI completion checks, site checks and web research, kept for review and audit. */
+export const aiReports = sqliteTable(
+  "ai_reports",
+  {
+    id: id(),
+    projectId: integer("project_id")
+      .notNull()
+      .references(() => projects.id),
+    kind: text("kind").$type<"completion" | "site_check" | "research">().notNull(),
+    input: text("input", { mode: "json" }).notNull(),
+    output: text("output", { mode: "json" }).notNull(),
+    model: text("model"),
+    createdBy: integer("created_by").references(() => members.id),
+    createdAt: createdAt(),
+  },
+  (t) => [index("ai_reports_project").on(t.projectId)],
 );

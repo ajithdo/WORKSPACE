@@ -58,6 +58,7 @@ export function SubmitButton({
   value,
   className = "",
   size = "md",
+  disabled = false,
 }: {
   children: React.ReactNode;
   variant?: keyof typeof VARIANTS;
@@ -66,6 +67,7 @@ export function SubmitButton({
   value?: string;
   className?: string;
   size?: "sm" | "md";
+  disabled?: boolean;
 }) {
   const { pending } = useFormStatus();
   return (
@@ -73,7 +75,7 @@ export function SubmitButton({
       type="submit"
       name={name}
       value={value}
-      disabled={pending}
+      disabled={pending || disabled}
       aria-busy={pending}
       onClick={(e) => {
         if (confirm && !window.confirm(confirm)) e.preventDefault();
