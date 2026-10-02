@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import { isoDate } from "@/server/context";
 import { formatDate, Money, Note } from "@/components/ui";
 import { getDb } from "@/db";
 import { taskInstances } from "@/db/schema";
@@ -24,7 +25,7 @@ export default async function QuotePage({ params, searchParams }: { params: Prom
   const { project: p, client, config } = projectHeader(db, projectId);
   const studio = getStudio(db);
   const validDays = Math.min(90, Math.max(1, Number((await searchParams).valid) || 15));
-  const today = new Date().toISOString().slice(0, 10);
+  const today = isoDate(new Date());
   const tasks = db
     .select()
     .from(taskInstances)

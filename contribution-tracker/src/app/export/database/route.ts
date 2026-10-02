@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { isoDate } from "@/server/context";
 import os from "node:os";
 import path from "node:path";
 import { getDb } from "@/db";
@@ -19,7 +20,7 @@ export async function GET() {
   return new Response(body, {
     headers: {
       "Content-Type": "application/vnd.sqlite3",
-      "Content-Disposition": `attachment; filename="contribution-tracker-${new Date().toISOString().slice(0, 10)}.db"`,
+      "Content-Disposition": `attachment; filename="contribution-tracker-${isoDate(new Date())}.db"`,
       "Cache-Control": "no-store",
     },
   });

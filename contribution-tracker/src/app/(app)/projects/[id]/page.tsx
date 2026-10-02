@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isoDate } from "@/server/context";
 import { eq } from "drizzle-orm";
 import { ActionForm, SubmitButton } from "@/components/forms";
 import { Field, formatDate, KeyValue, Money, Note, Points, Section } from "@/components/ui";
@@ -22,7 +23,7 @@ export default async function ProjectOverview({ params }: { params: Promise<{ id
   const live = tasks.filter((t) => t.status !== "cancelled" && t.status !== "proposed");
   const verifiedPts = live.filter((t) => t.status === "verified" || t.status === "locked").reduce((s, t) => s + t.defaultPoints * t.quantity * t.adjustmentFactor, 0);
   const milestones = p.kind === "client" ? projectMilestones(db, loadProject(db, projectId)) : [];
-  const fin = financeSummary(db, projectId, new Date().toISOString().slice(0, 10));
+  const fin = financeSummary(db, projectId, isoDate(new Date()));
   const names = memberNames(db);
   const nextGate = milestones.find((m) => m.state === "pending" && m.hardGate);
   const msConfig = new Map(config.milestones.map((m) => [m.code, m]));

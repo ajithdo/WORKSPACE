@@ -389,7 +389,7 @@ export function financeSummary(db: AppDb | DbOrTx, projectId: number, today?: st
   const issued = invs.filter((i) => i.status !== "draft" && i.status !== "cancelled");
   const settledByInvoice = new Map<number, number>();
   for (const p of pays) settledByInvoice.set(p.invoiceId, (settledByInvoice.get(p.invoiceId) ?? 0) + p.amountReceived + p.tdsDeducted);
-  const t = today ?? new Date().toISOString().slice(0, 10);
+  const t = today ?? isoDate(new Date());
   return {
     invoicedTotal: issued.reduce((s, i) => s + i.total, 0),
     invoicedExGst: issued.reduce((s, i) => s + i.amountExGst, 0),

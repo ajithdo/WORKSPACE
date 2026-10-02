@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isoDate } from "@/server/context";
 import { KeyValue, Money, Note, PageHeader, ScrollTable, Section } from "@/components/ui";
 import { getDb } from "@/db";
 import { requireMember } from "@/lib/session";
@@ -11,7 +12,7 @@ const fyLabel = (fy: string) => `FY 20${fy.replace("-", "–")}`;
 export default async function SummaryPage({ searchParams }: { searchParams: Promise<{ fy?: string }> }) {
   await requireMember();
   const db = getDb();
-  const years = summaryYears(db, new Date().toISOString().slice(0, 10));
+  const years = summaryYears(db, isoDate(new Date()));
   const asked = (await searchParams).fy;
   const fy = asked && years.includes(asked) ? asked : years[0]!;
   const y = yearSummary(db, fy);

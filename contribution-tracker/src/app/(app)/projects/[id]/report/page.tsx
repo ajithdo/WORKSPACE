@@ -1,4 +1,5 @@
 import { formatDate, Note, Section } from "@/components/ui";
+import { isoDate } from "@/server/context";
 import { ShareText } from "@/components/share-text";
 import { getDb } from "@/db";
 import { addDaysIso } from "@/domain/money";
@@ -9,16 +10,16 @@ import { projectHeader } from "@/server/queries";
 import { getStudio } from "@/server/settings";
 import { PrintButton } from "../statement/[snapshotId]/print-button";
 
-const isoDate = /^\d{4}-\d{2}-\d{2}$/;
+const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
 
 export default async function ClientUpdatePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ from?: string; to?: string }> }) {
   await requireMember();
   const projectId = Number((await params).id);
   const q = await searchParams;
   const db = getDb();
-  const today = new Date().toISOString().slice(0, 10);
-  const to = q.to && isoDate.test(q.to) ? q.to : today;
-  const from = q.from && isoDate.test(q.from) && q.from <= to ? q.from : addDaysIso(to, -6);
+  const today = isoDate(new Date());
+  const to = q.to && isoDatePattern.test(q.to) ? q.to : today;
+  const from = q.from && isoDatePattern.test(q.from) && q.from <= to ? q.from : addDaysIso(to, -6);
   const r = progressReport(db, projectId, from, to);
   const { client } = projectHeader(db, projectId);
   const studio = getStudio(db);

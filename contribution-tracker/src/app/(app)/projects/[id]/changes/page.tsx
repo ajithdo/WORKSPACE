@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isoDate } from "@/server/context";
 import { desc, eq } from "drizzle-orm";
 import { EvidenceForm } from "@/components/evidence-form";
 import { ActionButton, ActionForm, SubmitButton } from "@/components/forms";
@@ -29,7 +30,7 @@ export default async function ChangesPage({ params }: { params: Promise<{ id: st
   const { project: p, members, config } = projectHeader(db, projectId);
   const open = p.closeStatus !== "closed_locked";
   const rows = db.select().from(changeRequests).where(eq(changeRequests.projectId, projectId)).orderBy(desc(changeRequests.id)).all();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = isoDate(new Date());
   return (
     <>
       <Note>

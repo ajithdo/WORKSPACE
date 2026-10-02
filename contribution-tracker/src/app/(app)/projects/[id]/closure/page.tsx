@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isoDate } from "@/server/context";
 import { desc, eq } from "drizzle-orm";
 import { ActionButton, ActionForm, SubmitButton } from "@/components/forms";
 import { Field, formatDate, Money, Note, Pill, Points, ScrollTable, Section, Stamp } from "@/components/ui";
@@ -39,7 +40,7 @@ export default async function ClosurePage({ params }: { params: Promise<{ id: st
   const retros = db.select().from(retroItems).where(eq(retroItems.projectId, projectId)).all();
   const adjustments = db.select().from(postLockAdjustments).where(eq(postLockAdjustments.projectId, projectId)).orderBy(desc(postLockAdjustments.id)).all();
   const name = (id: number | string) => members.find((m) => m.id === Number(id))?.name ?? String(id);
-  const today = new Date().toISOString().slice(0, 10);
+  const today = isoDate(new Date());
   const locked = p.closeStatus === "closed_locked";
 
   const SnapshotTable = ({ outputs }: { outputs: CalcResult }) => (

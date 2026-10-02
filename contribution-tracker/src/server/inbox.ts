@@ -1,4 +1,5 @@
 import { and, eq, inArray, isNull, ne } from "drizzle-orm";
+import { isoDate } from "./context";
 import type { AppDb } from "@/db";
 import {
   studio,
@@ -98,7 +99,7 @@ export function inboxFor(db: AppDb, memberId: number, now: Date): InboxItem[] {
     for (const pay of db.select().from(payments).where(and(inArray(payments.projectId, ids), isNull(payments.verifiedBy))).all()) {
       if (pay.recordedBy !== memberId) push({ kind: "verify_payment", projectId: pay.projectId, title: "Check a payment against the bank statement", detail: `Ref ${pay.bankReference}`, href: `/projects/${pay.projectId}/finance`, at: pay.recordedAt });
     }
-    const today = now.toISOString().slice(0, 10);
+    const today = isoDate(now);
     for (const inv of db.select().from(invoices).where(inArray(invoices.projectId, ids)).all()) {
       if (overdueOn(inv, today)) push({ kind: "overdue_invoice", projectId: inv.projectId, title: `Invoice ${inv.number} is overdue`, detail: `Due ${inv.msmeDueDate ?? inv.dueDate}`, href: `/projects/${inv.projectId}/finance`, at: inv.dueDate });
     }
@@ -121,7 +122,7 @@ export function inboxFor(db: AppDb, memberId: number, now: Date): InboxItem[] {
     if (!hasVoted(db, "config_version", v.id, v.round, memberId)) push({ kind: "approve_version", projectId: null, title: `Approve rules v${v.version}`, detail: v.note, href: "/settings", at: v.createdAt });
   }
   // Form 16A arrives quarterly; chase it once two months have passed, or the TDS credit is lost.
-  const chaseBefore = new Date(now.getTime() - TDS_CHASE_DAYS * 86_400_000).toISOString().slice(0, 10);
+  const chaseBefore = isoDate(new Date(now.getTime() - TDS_CHASE_DAYS * 86_400_000));
   // Includes closed projects: the certificate can still be recorded after closure.
   const allMine = db
     .select({ id: projects.id, name: projects.name, code: projects.code })

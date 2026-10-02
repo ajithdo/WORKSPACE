@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { isoDate } from "./context";
 import path from "node:path";
 import { getTableConfig, type SQLiteTable } from "drizzle-orm/sqlite-core";
 import type { AppDb } from "@/db";
@@ -37,7 +38,7 @@ export async function backupDatabase(db: AppDb, destFile: string): Promise<strin
  * Returns the file written, or null when today's copy already exists.
  */
 export async function autoBackup(db: AppDb, dir: string, now: Date, keep: number): Promise<string | null> {
-  const name = `auto-${now.toISOString().slice(0, 10)}.db`;
+  const name = `auto-${isoDate(now)}.db`;
   const dest = path.join(dir, name);
   if (fs.existsSync(dest)) return null;
   await backupDatabase(db, dest);
@@ -57,7 +58,7 @@ let backedUpDay = "";
 /** Fire-and-forget daily backup; AUTO_BACKUP_DAYS (default 14) copies are kept, 0 turns it off. */
 export function maybeAutoBackup(db: AppDb, dataDirectory: string, now = new Date()) {
   const keep = Number(process.env.AUTO_BACKUP_DAYS ?? 14);
-  const day = now.toISOString().slice(0, 10);
+  const day = isoDate(now);
   if (!Number.isFinite(keep) || keep <= 0 || backupRunning || backedUpDay === day) return;
   backupRunning = true;
   autoBackup(db, path.join(dataDirectory, "backups"), now, Math.floor(keep))

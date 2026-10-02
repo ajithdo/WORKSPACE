@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isoDate } from "@/server/context";
 import { desc, eq } from "drizzle-orm";
 import { ActionButton, ActionForm, SubmitButton } from "@/components/forms";
 import { Empty, Field, formatDate, KeyValue, Money, Note, Pill, Section, Stamp } from "@/components/ui";
@@ -34,7 +35,7 @@ export default async function FinancePage({ params }: { params: Promise<{ id: st
   const { project: p, client, members, config } = projectHeader(db, projectId);
   const studio = getStudio(db);
   const open = p.closeStatus !== "closed_locked";
-  const today = new Date().toISOString().slice(0, 10);
+  const today = isoDate(new Date());
   const fin = financeSummary(db, projectId, today);
   const invs = db.select().from(invoices).where(eq(invoices.projectId, projectId)).orderBy(desc(invoices.id)).all();
   const pays = db.select().from(payments).where(eq(payments.projectId, projectId)).all();

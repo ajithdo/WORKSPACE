@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isoDate } from "@/server/context";
 import { notFound } from "next/navigation";
 import { evidenceTypeLabel, EvidenceForm } from "@/components/evidence-form";
 import { ActionButton, ActionForm, SubmitButton } from "@/components/forms";
@@ -44,7 +45,7 @@ export default async function TaskPage({ params }: { params: Promise<{ id: strin
   const names = memberNames(db);
   const name = (mid: number | null | undefined) => (mid ? (names.get(mid) ?? `#${mid}`) : "—");
   const tpl = d.template;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = isoDate(new Date());
   const pendingOnMe = d.adjustments.filter((a) => a.status === "requested" && a.requestedBy !== me.id);
 
   return (

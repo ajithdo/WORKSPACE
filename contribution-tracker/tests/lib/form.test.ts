@@ -11,3 +11,14 @@ describe("IST date-times", () => {
     expect(istNowLocal(new Date("2026-10-01T20:00:00Z"))).toBe("2026-10-02T01:30");
   });
 });
+
+describe("India calendar date", () => {
+  it("is already 1 April in India at 19:00 UTC on 31 March (new financial year)", async () => {
+    const { isoDate } = await import("@/server/context");
+    const { financialYearLabel } = await import("@/domain/money");
+    const d = isoDate(new Date("2027-03-31T19:00:00Z"));
+    expect(d).toBe("2027-04-01");
+    expect(financialYearLabel(d)).toBe("27-28");
+    expect(isoDate(new Date("2027-03-31T18:00:00Z"))).toBe("2027-03-31");
+  });
+});
