@@ -69,6 +69,21 @@ describe("OpenRouter provider", () => {
     expect(seen[1]?.response_format).toBeUndefined();
   });
 
+  it("never sends a third request when the fallback answer is also unreadable", async () => {
+    const f = bootstrap();
+    const seen = stub([Response.json({ error: { message: "response_format not supported" } }, { status: 400 }), reply("prose only")]);
+    await expect(runCompletionCheck(f.at(f.a), f.projectId, { url: null, notes: "Built the home page" })).rejects.toThrow(/could not be read/);
+    expect(seen).toHaveLength(2);
+  });
+
+  it("keeps OpenRouter's own error text out of the message shown to people", async () => {
+    const f = bootstrap();
+    stub([Response.json({ error: { message: "upstream detail sk-or-secret" } }, { status: 500 })]);
+    const err = await runCompletionCheck(f.at(f.a), f.projectId, { url: null, notes: "x notes" }).catch((e: Error) => e);
+    expect((err as Error).message).toMatch(/request failed \(500\)/);
+    expect((err as Error).message).not.toContain("upstream detail");
+  });
+
   it("asks once more when the answer is not JSON, then gives a clear error", async () => {
     const f = bootstrap();
     stub([reply("Sorry, I can't format that."), reply("Still prose.")]);
@@ -93,11 +108,13 @@ describe("OpenRouter provider", () => {
     expect(seen[0]?.plugins).toBeUndefined();
     expect(seen[0]?.messages[0]?.content).toContain("cannot browse");
     const out = f.db.select().from(aiReports).where(eq(aiReports.id, reportId)).get()?.output as {
+      suggestionsModel: string;
       liveSearch: boolean;
       sources: unknown[];
       suggestions: { priority: string; libraryCodes: string[]; exampleUrls: string[] }[];
     };
     expect(out.liveSearch).toBe(false);
+    expect(out.suggestionsModel).toBe("nvidia/nemotron-free:free");
     expect(out.sources).toEqual([]);
     expect(out.suggestions[0]).toMatchObject({ priority: "must", libraryCodes: ["AB-01"], exampleUrls: [] });
   });

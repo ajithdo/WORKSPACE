@@ -75,11 +75,13 @@ async function post(body: Record<string, unknown>): Promise<{ status: number; js
 }
 
 function errorFor(status: number, json: Record<string, unknown> | null): DomainError {
+  // The upstream text can include request details; it goes to the server log, not to the browser.
   const message = String((json?.error as { message?: unknown } | undefined)?.message ?? "").slice(0, 200);
+  if (message) console.error("OpenRouter error", { status, message });
   if (status === 401) return new DomainError("invalid", "OpenRouter rejected the key. Check OPENROUTER_API_KEY on the server.");
   if (status === 402) return new DomainError("conflict", "OpenRouter says this request needs credits. Free models (openrouter/free or names ending in :free) cost nothing; web search does not.");
   if (status === 429) return new DomainError("conflict", "OpenRouter's free models are busy or today's free requests are used up. Try again later.");
-  return new DomainError("conflict", `OpenRouter error${status ? ` ${status}` : ""}${message ? `: ${message}` : ""}`);
+  return new DomainError("conflict", `The OpenRouter request failed${status ? ` (${status})` : ""}. Try again later.`);
 }
 
 export async function openRouterChat<T = never>(opts: ChatOptions<T>): Promise<OpenRouterResult<T>> {
@@ -98,11 +100,15 @@ export async function openRouterChat<T = never>(opts: ChatOptions<T>): Promise<O
   };
   const withFormat = jsonSchema ? { ...base, response_format: { type: "json_schema", json_schema: { name: "answer", strict: false, schema: jsonSchema } } } : base;
 
-  // Two attempts: some free models reject response_format or return text that isn't the JSON asked for.
+  // At most two requests: some free models reject response_format (the retry drops it), others return
+  // text that isn't the JSON asked for (the retry asks again).
   let last: OpenRouterResult<T> | null = null;
   for (let attempt = 0; attempt < 2; attempt++) {
     let { status, json } = await post(attempt === 0 ? withFormat : base);
-    if (status === 400 && attempt === 0 && jsonSchema) ({ status, json } = await post(base));
+    if (status === 400 && attempt === 0 && jsonSchema) {
+      ({ status, json } = await post(base));
+      attempt = 1;
+    }
     if (status < 200 || status >= 300 || !json || json.error) throw errorFor(status, json);
     const choice = (json.choices as { message?: { content?: unknown; annotations?: unknown } }[] | undefined)?.[0]?.message;
     const text = typeof choice?.content === "string" ? choice.content : "";

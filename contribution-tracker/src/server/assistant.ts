@@ -423,12 +423,18 @@ Then list what a new site for this business must have, should have and could hav
   const mapping = `Turn a research brief into website suggestions for a studio's project plan. Map each suggestion to task codes from this library where one fits (use only these codes):\n${library.map((l) => `${l.code} ${l.name}`).join("\n")}\nCategories for new tasks: ${categories}. New-task points: 1–10, roughly hours of work.`;
   const briefText = `Research brief:\n${brief}\n\nSources seen:\n${[...sources.values()].map((s) => `${s.title} ${s.url}`).join("\n") || "(none: written without a live web search)"}`;
   let output: ResearchOutput;
+  // openrouter/free can route each request to a different model, so the suggestions step records its own.
+  let suggestionsModel = model;
   if (provider === "openrouter") {
     const res = await openRouterChat({ model: aiModel(), system: mapping, user: briefText, schema: ResearchSchema, prepare: tidyResearch }).catch((e: unknown) => {
-      if (e instanceof DomainError) return null;
+      if (e instanceof DomainError) {
+        console.error("OpenRouter research suggestions failed; keeping the brief", e);
+        return null;
+      }
       throw e;
     });
     output = res?.parsed ?? { summary: "Could not turn the research into suggestions; the brief is still saved.", suggestions: [] };
+    if (res) suggestionsModel = res.model;
   } else try {
     const res = await clientFactory().beta.messages.parse({
       model,
@@ -450,7 +456,7 @@ Then list what a new site for this business must have, should have and could hav
   return ctx.db.transaction((tx) => {
     const id = tx
       .insert(aiReports)
-      .values({ projectId, kind: "research", input, output: { ...output, brief, sources: [...sources.values()], liveSearch }, model, createdBy: actor, createdAt: iso(ctx.now) })
+      .values({ projectId, kind: "research", input, output: { ...output, brief, sources: [...sources.values()], liveSearch, suggestionsModel }, model, createdBy: actor, createdAt: iso(ctx.now) })
       .returning({ id: aiReports.id })
       .get().id;
     audit(tx, ctx, "assistant.research", "ai_report", id, projectId, undefined, { niche, sources: sources.size, suggestions: output.suggestions.length });
