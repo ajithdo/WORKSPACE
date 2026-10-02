@@ -38,7 +38,7 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 
 **D17 · Hybrid effort rule.** After plan lock, an adjustment factor above 1.0 can be requested only when the hours logged on the task exceed `effort_adjustment_trigger_multiple` (default 2) × the estimated midpoint hours. Lowering a factor needs no trigger. Both directions need the other partner's approval and a reason.
 
-**D18 · Milestones are derived, not stored.** Spec section 15 lists Milestone as an entity. The app computes each milestone's state from its definition in the pinned rules version and the live task states, instead of keeping a table. Its date is when the last required task was verified (or the client approval, deemed acceptance or snapshot it needs). This way a milestone can never disagree with the work it summarises, and a descoped gate task shows the milestone as *waived* (D9).
+**D18 · Milestones are derived, not stored.** Spec section 15 lists Milestone as an entity. The app computes each milestone's state from its definition in the pinned rules version and the live task states, instead of keeping a table. Its date is the latest verification or client-approval time among its required tasks. This way a milestone can never disagree with the work it summarises, and a descoped gate task shows the milestone as *waived* (D9).
 
 ## Added must-have features
 
