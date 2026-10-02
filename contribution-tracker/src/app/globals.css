@@ -9,7 +9,7 @@
   --color-paper: #ffffff;
   --color-ink: #1b2a4a;
   --color-ink-soft: #46567a;
-  --color-ink-faint: #7a879f;
+  --color-ink-faint: #606d86; /* 5.2:1 on white, 4.8:1 on the page tint (WCAG AA for small text) */
   --color-rule: #dce3ee;
   --color-rule-strong: #c2ccdb;
 
