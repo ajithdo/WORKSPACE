@@ -75,8 +75,16 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
     - Each partner's payouts from locked snapshots (reimbursed, base, pool, paid, still to pay).
     - The studio's invoicing, cash, GST, TDS, expenses and reserve movement.
 
+21. **Client update.** A weekly progress report per project (the SOP's progress update). It is printable, and an editable message opens in WhatsApp or email. It shows:
+    - client-facing milestones;
+    - work signed off in the chosen dates;
+    - work in progress;
+    - what waits on the client: approvals of finished deliverables and unpaid invoices.
+
+    Sales, partner-admin and other internal tasks and milestones are never included.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens
 
-`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/invoice/[invoiceId]` · `…/assistant` · `/summary` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.
+`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/report` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/invoice/[invoiceId]` · `…/assistant` · `/summary` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.

@@ -16,7 +16,7 @@ export interface ReminderInput {
 }
 
 const dateFmt = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
-const readable = (iso: string) => dateFmt.format(new Date(`${iso}T00:00:00Z`));
+export const readableDate = (iso: string) => dateFmt.format(new Date(`${iso.slice(0, 10)}T00:00:00Z`));
 
 export function daysBetween(fromIso: string, toIso: string): number {
   return Math.round((Date.parse(`${toIso}T00:00:00Z`) - Date.parse(`${fromIso}T00:00:00Z`)) / 86_400_000);
@@ -33,7 +33,7 @@ export function reminderMessage(r: ReminderInput): { tone: ReminderTone; daysOve
   const tone = reminderTone(daysOverdue);
   const amount = formatINR(r.outstandingPaise);
   const greeting = `Hello ${r.contactName || r.clientName},`;
-  const ref = `invoice ${r.invoiceNumber} dated ${readable(r.issueDate)} (${amount} outstanding, due ${readable(r.dueDate)})`;
+  const ref = `invoice ${r.invoiceNumber} dated ${readableDate(r.issueDate)} (${amount} outstanding, due ${readableDate(r.dueDate)})`;
   const msmeNote = r.msme
     ? `As a Udyam-registered MSE${r.udyamNumber ? ` (${r.udyamNumber})` : ""}, payments beyond 45 days attract compound interest at three times the RBI bank rate under section 16 of the MSMED Act 2006.`
     : "";

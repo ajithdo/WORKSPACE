@@ -48,6 +48,7 @@ export default async function ProjectLayout({ children, params }: { children: Re
     { href: `${base}/plan`, label: "Plan" },
     { href: `${base}/board`, label: "Board", count: toVerify },
     { href: `${base}/communications`, label: "Communications" },
+    ...(p.kind !== "studio" ? [{ href: `${base}/report`, label: "Client update" }] : []),
     ...(p.kind === "client" ? [{ href: `${base}/changes`, label: "Change requests" }] : []),
     { href: `${base}/finance`, label: "Finance" },
     ...(p.kind === "client" ? [{ href: `${base}/handover`, label: "Handover" }] : []),
