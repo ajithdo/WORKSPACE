@@ -48,7 +48,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <label htmlFor="nav-search" className="sr-only">
                 Search
               </label>
-              <input id="nav-search" name="q" type="search" placeholder="Search…" className="w-full rounded-md border border-white/20 bg-white/10 px-3 py-1.5 text-sm text-white placeholder:text-white/50 focus:bg-white/15 focus:outline-none" />
+              <input id="nav-search" name="q" type="search" placeholder="Search…" className="w-full rounded-md border border-white/20 bg-white/10 px-3 py-1.5 text-sm text-white placeholder:text-white/50 focus:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white" />
             </form>
             <SideNav items={nav} />
           </div>
