@@ -254,7 +254,7 @@ export default async function SettingsPage() {
         </details>
       </Section>
 
-      <Section title="Studio details" description="Used on invoices and statements.">
+      <Section id="studio" title="Studio details" description="Used on invoices, quotations and statements.">
         <ActionForm action={updateStudioAction} className="grid max-w-3xl gap-3 sm:grid-cols-2">
           <Field label="Studio name">
             <input className="field-input" name="name" defaultValue={studio?.name} required />

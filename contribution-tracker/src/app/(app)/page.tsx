@@ -20,6 +20,7 @@ const KIND_LABEL: Record<InboxKind, { label: string; tone: "royal" | "waiting" |
   approve_reserve: { label: "Reserve", tone: "waiting" },
   overdue_invoice: { label: "Overdue", tone: "ledger" },
   approve_version: { label: "Rules", tone: "royal" },
+  setup_studio: { label: "Setup", tone: "neutral" },
 };
 
 export default async function InboxPage() {

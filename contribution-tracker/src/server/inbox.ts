@@ -1,6 +1,7 @@
 import { and, eq, inArray, isNull, ne } from "drizzle-orm";
 import type { AppDb } from "@/db";
 import {
+  studio,
   adjustmentRequests,
   communications,
   configVersions,
@@ -36,7 +37,8 @@ export type InboxKind =
   | "approve_expense"
   | "approve_reserve"
   | "overdue_invoice"
-  | "approve_version";
+  | "approve_version"
+  | "setup_studio";
 
 export interface InboxItem {
   kind: InboxKind;
@@ -113,6 +115,13 @@ export function inboxFor(db: AppDb, memberId: number, now: Date): InboxItem[] {
   }
   for (const v of db.select().from(configVersions).where(eq(configVersions.status, "pending")).all()) {
     if (!hasVoted(db, "config_version", v.id, v.round, memberId)) push({ kind: "approve_version", projectId: null, title: `Approve rules v${v.version}`, detail: v.note, href: "/settings", at: v.createdAt });
+  }
+  const st = db.select().from(studio).get();
+  if (st) {
+    const missing = [!st.legalName && "legal name", !st.address && "address", st.gstRegistered && !st.gstin && "GSTIN", st.msmeRegistered && !st.udyamNumber && "Udyam number"].filter(Boolean);
+    if (missing.length) {
+      push({ kind: "setup_studio", projectId: null, title: "Complete the studio details", detail: `Invoices and quotations print without your ${missing.join(", ")}`, href: "/settings#studio", at: st.createdAt });
+    }
   }
   return items.sort((a, b) => a.at.localeCompare(b.at));
 }
