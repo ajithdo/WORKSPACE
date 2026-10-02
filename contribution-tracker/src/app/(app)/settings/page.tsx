@@ -164,7 +164,13 @@ export default async function SettingsPage() {
               {ledger.map((r) => (
                 <tr key={r.id}>
                   <td>{formatDate(r.entryDate)}</td>
-                  <td>{r.purpose}</td>
+                  <td>
+                    {r.purpose}
+                    <span className="block text-xs text-ink-faint">
+                      by {name(r.createdBy)}
+                      {r.approvedBy ? `, approved by ${name(r.approvedBy)}` : ""}
+                    </span>
+                  </td>
                   <td className="num">
                     <Money paise={r.direction === "in" ? r.amount : -r.amount} />
                   </td>

@@ -3,7 +3,7 @@
 import { runAction, type ActionState } from "@/lib/actions";
 import { bool, int, num, optMoney, str } from "@/lib/form";
 import { addChangeRequestTask, advanceChangeRequest, assessChangeRequest, invoiceChangeRequest, logChangeRequest } from "@/server/changeRequests";
-import { addEvidenceFor } from "../tasks/[taskId]/actions";
+import { addEvidenceFor } from "@/lib/evidence-action";
 
 type Cls = "bug" | "revision" | "change";
 

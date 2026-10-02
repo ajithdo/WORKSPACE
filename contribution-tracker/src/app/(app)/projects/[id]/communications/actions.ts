@@ -3,7 +3,7 @@
 import { runAction, type ActionState } from "@/lib/actions";
 import { bool, int, lines, optInt, optStr, str } from "@/lib/form";
 import { cancelCommunication, logCommunication, planCommunication, rejectCommunication, verifyCommunication } from "@/server/communications";
-import { addEvidenceFor } from "../tasks/[taskId]/actions";
+import { addEvidenceFor } from "@/lib/evidence-action";
 
 const toIso = (local: string) => (local ? new Date(local).toISOString() : new Date().toISOString());
 
