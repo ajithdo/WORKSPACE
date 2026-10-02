@@ -104,10 +104,14 @@
 ## Progress
 
 - [x] Plan written
-- [ ] Task 1 Scaffold
-- [ ] Task 2 Domain
-- [ ] Task 3 Database
-- [ ] Task 4 Services
-- [ ] Task 5 UI
-- [ ] Task 6 E2E/QA/packaging
-- [ ] Task 7 Review + PR
+- [x] Task 1 Scaffold
+- [x] Task 2 Domain (calc cross-checked against reference_calc.py on 200 random cases)
+- [x] Task 3 Database (immutability triggers, hash-chained audit)
+- [x] Task 4 Services
+- [x] Task 5 UI (all screens in DECISIONS.md, mobile checked at 390px)
+- [x] Task 6 E2E/QA/packaging (Playwright flow, Dockerfile + compose, backup/verify-audit/seed-demo scripts, README)
+- [x] Extra: site Preview tab, automated site check, Claude completion check, Claude niche research with web search
+- [x] Extra: printable GST tax invoice
+- [x] Task 7 Review (authorization, SSRF guard, print checks); fixes pushed
+- [ ] Open PR. Blocked: the repo has no base branch, because this branch became the default. A `main` branch must be created first. The PR text is ready in `contribution-tracker/docs/PR_DESCRIPTION.md`.
+- [ ] Not verified here: `docker build` (no Docker daemon in the sandbox; the same standalone layout was run directly and works) and live Claude calls (no API key in the sandbox; covered by tests with a fake client).
