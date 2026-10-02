@@ -80,5 +80,11 @@ test("setup → create project → both partners lock the plan → task done and
   await page.goto(projectPath + "/assistant");
   await expect(page.getByText(/ANTHROPIC_API_KEY/).first()).toBeVisible();
 
+  // Client update and the yearly summary render.
+  await page.goto(projectPath + "/report");
+  await expect(page.getByText("Message for the client (edit before sending)")).toBeVisible();
+  await page.goto("/summary");
+  await expect(page.getByRole("heading", { name: "Year at a glance" })).toBeVisible();
+
   expect(errors).toEqual([]);
 });

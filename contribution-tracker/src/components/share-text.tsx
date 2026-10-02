@@ -1,17 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 
 /** Editable message with copy, WhatsApp and email buttons; the partner sends it themselves. */
 export function ShareText({ text, subject, phone, email, label }: { text: string; subject: string; phone: string | null; email: string; label: string }) {
   const [value, setValue] = useState(text);
   const [copied, setCopied] = useState(false);
+  const id = useId();
   return (
     <div className="print:hidden">
-      <label htmlFor="share-text" className="text-sm font-semibold">
+      <label htmlFor={id} className="text-sm font-semibold">
         {label}
       </label>
-      <textarea id="share-text" className="field-input mt-1 h-64 w-full font-normal" value={value} onChange={(e) => setValue(e.target.value)} />
+      <textarea id={id} data-share-text className="field-input mt-1 h-64 w-full font-normal" value={value} onChange={(e) => setValue(e.target.value)} />
       <div className="mt-2 flex flex-wrap gap-4 text-sm">
         <button
           type="button"
