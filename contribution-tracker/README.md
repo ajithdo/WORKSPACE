@@ -18,7 +18,7 @@ It implements `docs/spec/contribution-app-spec.md`. Every place the spec was sil
 | Project → **Plan / Board / task pages** | Lock the plan together. Then start each task, add evidence and submit it; your partner verifies. |
 | Project → **Client update** | A weekly progress report to print, or to send by WhatsApp or email. |
 | Project → **Finance** | Invoices (print as a GST tax invoice), payments, expenses, the quotation, and ready-made payment reminders for overdue invoices. |
-| Project → **Preview / AI assistant** | See the site you're building, run the free site check, and let Claude suggest finished tasks or research the niche. |
+| Project → **Preview / AI assistant** | See the site you're building, run the free site check, and let the AI suggest finished tasks or research the niche. |
 | Project → **Contribution / Closure** | The live split, then the locked, hash-checked final split and the printable statement. |
 | **Year at a glance** | Each partner's payouts and the studio's money for a financial year. |
 | **Studio and rules** | Studio details for invoices, partners, the money rules (changed only with both partners' approval), the reserve, CSV exports for your CA, and backups. |
@@ -63,7 +63,7 @@ Sign in as `asha@studio.test` / `demo password one`, or as `bala@studio.test` / 
 5. **Finance → Quotation** gives the client a printable quote. When the contract is signed, raise the advance invoice, then record the payment when it arrives. Your partner ticks "Matches bank".
 6. **Do the work:** pick tasks from **My work**, add evidence, submit. Your partner verifies from **Needs your action**.
 7. Optional:
-   - add `ANTHROPIC_API_KEY` for the AI assistant;
+   - add `OPENROUTER_API_KEY` (free) or `ANTHROPIC_API_KEY` for the AI assistant;
    - add `GITHUB_WEBHOOK_SECRET` so commits become evidence;
    - set up an off-server copy of the `data` folder (see below).
 
@@ -89,12 +89,19 @@ Each project has two extra tabs.
 **AI assistant** has three tools:
 
 1. **Site check** is free, needs no key, and runs on the server. It checks HTTPS, the http→https redirect, mixed content, security headers, title/description, headings, canonical, sitemap, robots.txt, structured data, Open Graph, analytics, `lang`, image alt text, the privacy policy link and the 404 page. Each finding is mapped to its library task code.
-2. **What did we finish?** runs after a build session. Claude reads the site check and your notes, then lists the open tasks that look done, with its reasons.
+2. **What did we finish?** runs after a build session. The AI reads the site check and your notes, then lists the open tasks that look done, with its reasons.
 3. **Research the niche** searches the web for the best sites of the same kind (for example "bakery, Hyderabad"). It suggests what to add or improve and maps each suggestion to a library task, or proposes a new one. The research can be saved as evidence.
 
 The assistant only suggests. Accepting a suggestion adds evidence and submits the task in your name, and the other partner still verifies it before any points count.
 
-Claude features need an Anthropic API key. Create one at https://console.anthropic.com, put it in `.env` as `ANTHROPIC_API_KEY=…` on the server only, and restart the app. Never put the key in the app, in evidence, or in chat. You can tune the assistant with `AI_MODEL` and `AI_EFFORT` (`low` / `medium` / `high`). `AI_DAILY_LIMIT` (default 20) caps Claude requests per day, so a busy day can't run up an unexpected bill.
+The AI tools need one key, set in `.env` on the server only. Never put a key in the app, in evidence, or in chat. Restart the app after changing `.env` (`docker compose up -d`).
+
+| Key | Cost | What you get |
+|---|---|---|
+| `OPENROUTER_API_KEY` (from https://openrouter.ai/settings/keys) | Free with OpenRouter's free models (`openrouter/free`, the default) | Both tools work. The niche research is written from the model's own knowledge, without a live web search, and the report says so; check the example sites yourself. Free models are slower and less reliable, and OpenRouter limits free requests per day. `OPENROUTER_WEB_SEARCH=true` turns on live search, which needs OpenRouter credits. |
+| `ANTHROPIC_API_KEY` (from https://console.anthropic.com) | Paid per use | Claude, with live web search and the most careful answers. |
+
+If both are set, Anthropic is used unless `AI_PROVIDER=openrouter`. `AI_MODEL` picks another model (any OpenRouter model id, such as one ending in `:free`), and `AI_EFFORT` (`low` / `medium` / `high`) tunes Claude. `AI_DAILY_LIMIT` (default 20) caps AI requests per day, so a busy day can't run up an unexpected bill.
 
 The server refuses to fetch loopback, link-local (cloud metadata) and multicast addresses, so the site check works on staging and live addresses, not on `localhost`.
 

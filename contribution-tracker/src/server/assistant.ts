@@ -11,14 +11,15 @@ import { DomainError } from "./errors";
 import { addEvidence } from "./evidence";
 import { storeFile } from "./files";
 import { startTask, submitTask } from "./tasks";
+import { OPENROUTER_FREE_MODEL, openRouterChat } from "./openrouter";
 import { safeFetch } from "./web";
 
 /*
- * AI assistance. Claude suggests; people decide. Nothing here verifies a task or awards points:
+ * AI assistance. The model suggests; people decide. Nothing here verifies a task or awards points:
  * an accepted suggestion becomes evidence and a submission, and the other partner still verifies it.
  */
 
-export const AI_MODEL = process.env.AI_MODEL || "claude-opus-5-5";
+export type AiProvider = "anthropic" | "openrouter";
 const AI_EFFORT = (process.env.AI_EFFORT || "medium") as "low" | "medium" | "high" | "xhigh" | "max";
 const FALLBACK_BETA = "server-side-fallback-2026-07-01";
 
@@ -28,9 +29,35 @@ export function setAiClientFactory(f: () => AiClient) {
   clientFactory = f;
 }
 
-export function aiConfigured(): boolean {
-  return !!(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
+/** Anthropic (Claude) when its key is set, otherwise OpenRouter (free models). AI_PROVIDER picks one when both are set. */
+export function aiProvider(): AiProvider | null {
+  const anthropic = !!(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
+  const openrouter = !!process.env.OPENROUTER_API_KEY;
+  const wanted = process.env.AI_PROVIDER;
+  if (wanted === "openrouter" && openrouter) return "openrouter";
+  if (wanted === "anthropic" && anthropic) return "anthropic";
+  return anthropic ? "anthropic" : openrouter ? "openrouter" : null;
 }
+
+export function aiConfigured(): boolean {
+  return aiProvider() !== null;
+}
+
+export function aiModel(): string {
+  return process.env.AI_MODEL || (aiProvider() === "openrouter" ? OPENROUTER_FREE_MODEL : "claude-opus-5-5");
+}
+
+/** What the page calls the assistant. */
+export function aiName(): string {
+  return aiProvider() === "openrouter" ? "the AI" : "Claude";
+}
+
+/** OpenRouter's web search is billed per search, so it is off unless asked for. Claude always searches. */
+export function aiLiveSearch(): boolean {
+  return aiProvider() === "anthropic" || process.env.OPENROUTER_WEB_SEARCH === "true";
+}
+
+const AI_OFF = "AI is off: set OPENROUTER_API_KEY (free models) or ANTHROPIC_API_KEY on the server";
 
 function aiError(e: unknown): DomainError {
   if (e instanceof DomainError) return e;
@@ -144,7 +171,7 @@ For each task, decide whether the material shows it is done. Be conservative:
 - Recent commits show that code was written for a task, not that the deliverable is live or accepted: alone they support "partly" unless the commit itself is the deliverable (for example a config or file that the task asks for).
 Only list tasks you can say something useful about; skip tasks the material does not touch.`;
 
-/** Claude calls allowed per day across the studio (completion checks + research). 0 turns the cap off. */
+/** AI requests allowed per day across the studio (completion checks + research). 0 turns the cap off. */
 export function aiDailyLimit(): number {
   const n = Number(process.env.AI_DAILY_LIMIT ?? 20);
   return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 20;
@@ -160,12 +187,12 @@ export function assertAiBudget(ctx: Ctx) {
     .from(aiReports)
     .where(and(inArray(aiReports.kind, ["completion", "research"]), gte(aiReports.createdAt, since)))
     .all().length;
-  if (used >= limit) throw new DomainError("conflict", `Today's limit of ${limit} Claude requests is used up (set AI_DAILY_LIMIT on the server to change it). The free site check still works.`);
+  if (used >= limit) throw new DomainError("conflict", `Today's limit of ${limit} AI requests is used up (set AI_DAILY_LIMIT on the server to change it). The free site check still works.`);
 }
 
 export async function runCompletionCheck(ctx: Ctx, projectId: number, input: { url: string | null; notes: string }): Promise<{ reportId: number }> {
   const actor = requireActor(ctx);
-  if (!aiConfigured()) throw new DomainError("conflict", "AI is off: set ANTHROPIC_API_KEY on the server to use the completion check");
+  if (!aiConfigured()) throw new DomainError("conflict", AI_OFF);
   const p = loadProject(ctx.db, projectId);
   assertProjectOpen(p);
   assertProjectMember(ctx.db, projectId, actor);
@@ -203,10 +230,23 @@ export async function runCompletionCheck(ctx: Ctx, projectId: number, input: { u
     : "(none)";
   if (!target && !notes && !commits.length) throw new DomainError("invalid", "Give a site address or paste notes from your build");
   const taskList = tasks.map((t) => `${t.code} | ${t.name} | ${t.description.slice(0, 200)} | deliverable: ${t.deliverable} | evidence: ${t.evidenceExpected}`).join("\n");
+  const material = `${siteText}\n\nBuilders' notes / repository summary:\n${notes || "(none)"}\n\nRecent commits (task code they mention):\n${commitText}`;
   let output: CompletionOutput;
-  try {
+  let model = aiModel();
+  if (aiProvider() === "openrouter") {
+    const res = await openRouterChat({
+      model,
+      system: `${COMPLETION_SYSTEM}\n\nOpen tasks (code | name | description | deliverable | evidence expected):\n${taskList}`,
+      user: material,
+      schema: CompletionSchema,
+      prepare: tidyCompletion,
+    });
+    if (!res.parsed) throw new DomainError("conflict", "The AI's answer could not be read. Try again; free models are sometimes unreliable.");
+    output = res.parsed;
+    model = res.model;
+  } else try {
     const res = await clientFactory().beta.messages.parse({
-      model: AI_MODEL,
+      model,
       max_tokens: 16000,
       betas: [FALLBACK_BETA],
       fallbacks: "default",
@@ -215,7 +255,7 @@ export async function runCompletionCheck(ctx: Ctx, projectId: number, input: { u
         { type: "text", text: COMPLETION_SYSTEM },
         { type: "text", text: `Open tasks (code | name | description | deliverable | evidence expected):\n${taskList}`, cache_control: { type: "ephemeral" } },
       ],
-      messages: [{ role: "user", content: `${siteText}\n\nBuilders' notes / repository summary:\n${notes || "(none)"}\n\nRecent commits (task code they mention):\n${commitText}` }],
+      messages: [{ role: "user", content: material }],
     });
     if (res.stop_reason === "refusal") throw new DomainError("conflict", "Claude declined to review this material");
     if (!res.parsed_output) throw new DomainError("conflict", "Claude's answer could not be read; try again");
@@ -230,7 +270,7 @@ export async function runCompletionCheck(ctx: Ctx, projectId: number, input: { u
   return ctx.db.transaction((tx) => {
     const id = tx
       .insert(aiReports)
-      .values({ projectId, kind: "completion", input: { url: target, notes: notes.slice(0, 2000) }, output: { ...output, checks }, model: AI_MODEL, createdBy: actor, createdAt: iso(ctx.now) })
+      .values({ projectId, kind: "completion", input: { url: target, notes: notes.slice(0, 2000) }, output: { ...output, checks }, model, createdBy: actor, createdAt: iso(ctx.now) })
       .returning({ id: aiReports.id })
       .get().id;
     audit(tx, ctx, "assistant.completion_check", "ai_report", id, projectId, undefined, { url: target, suggestedDone: output.tasks.filter((t) => t.verdict === "done").map((t) => t.code) });
@@ -263,6 +303,34 @@ export function acceptSuggestion(ctx: Ctx, projectId: number, input: { code: str
   }
 }
 
+// Free models often drop nullable fields or write "not done"; fix that before validation.
+const obj = (v: unknown): Record<string, unknown> => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
+const enumish = (v: unknown) => (typeof v === "string" ? v.trim().toLowerCase().replace(/[\s-]+/g, "_") : v);
+
+function tidyCompletion(raw: unknown): unknown {
+  const o = obj(raw);
+  const tasks = Array.isArray(o.tasks) ? o.tasks : [];
+  return {
+    summary: o.summary ?? "",
+    tasks: tasks.map((t) => {
+      const x = obj(t);
+      return { ...x, verdict: enumish(x.verdict), confidence: enumish(x.confidence), reason: x.reason ?? "", evidenceUrl: x.evidenceUrl || null, evidenceType: enumish(x.evidenceType) || null };
+    }),
+  };
+}
+
+function tidyResearch(raw: unknown): unknown {
+  const o = obj(raw);
+  const list = Array.isArray(o.suggestions) ? o.suggestions : [];
+  return {
+    summary: o.summary ?? "",
+    suggestions: list.map((s) => {
+      const x = obj(s);
+      return { ...x, why: x.why ?? "", priority: enumish(x.priority), exampleUrls: Array.isArray(x.exampleUrls) ? x.exampleUrls : [], libraryCodes: Array.isArray(x.libraryCodes) ? x.libraryCodes : [], newTask: x.newTask ?? null };
+    }),
+  };
+}
+
 // ---------- web research ----------
 
 export const ResearchSchema = z.object({
@@ -287,24 +355,40 @@ interface Source {
 
 export async function runResearch(ctx: Ctx, projectId: number, input: { niche: string; location: string; focus: string }): Promise<{ reportId: number }> {
   const actor = requireActor(ctx);
-  if (!aiConfigured()) throw new DomainError("conflict", "AI is off: set ANTHROPIC_API_KEY on the server to use web research");
+  if (!aiConfigured()) throw new DomainError("conflict", AI_OFF);
   const niche = input.niche.trim();
   if (niche.length < 3) throw new DomainError("invalid", "Describe the kind of business, e.g. \"bakery with custom cakes\"");
   const p = loadProject(ctx.db, projectId);
   assertProjectOpen(p);
   assertProjectMember(ctx.db, projectId, actor);
   assertAiBudget(ctx);
-  const client = clientFactory();
   const ask = `Research the best websites for this kind of business: ${niche}${input.location ? `, in or near ${input.location}` : ""}.
 ${input.focus ? `Focus: ${input.focus}.\n` : ""}Find 5–8 strong, current examples (local and international). For each pattern you see repeatedly, explain what the sites do and why it helps customers or conversions.
 Then list what a new site for this business must have, should have and could have, and common mistakes to avoid. Cite the sites you looked at.`;
-  const messages: Anthropic.Beta.BetaMessageParam[] = [{ role: "user", content: ask }];
+  const provider = aiProvider();
+  const liveSearch = aiLiveSearch();
+  let model = aiModel();
   const sources = new Map<string, Source>();
   let brief = "";
-  try {
+  if (provider === "openrouter") {
+    const res = await openRouterChat({
+      model,
+      system: liveSearch
+        ? "You are a web strategist helping a two-person Indian web studio plan a client website. Be concrete and cite sources."
+        : "You are a web strategist helping a two-person Indian web studio plan a client website. You cannot browse the web: work from what you know, name only well-known sites you are confident exist, never invent URLs, and say that examples should be checked.",
+      user: ask,
+      webSearch: liveSearch,
+    });
+    brief = res.text.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+    for (const c of res.citations) sources.set(c.url, c);
+    model = res.model;
+    if (!brief) throw new DomainError("conflict", "The research came back empty; try again");
+  } else try {
+    const client = clientFactory();
+    const messages: Anthropic.Beta.BetaMessageParam[] = [{ role: "user", content: ask }];
     for (let turn = 0; turn < 5; turn++) {
       const res = await client.beta.messages.create({
-        model: AI_MODEL,
+        model,
         max_tokens: 16000,
         betas: [FALLBACK_BETA],
         fallbacks: "default",
@@ -336,22 +420,24 @@ Then list what a new site for this business must have, should have and could hav
     .where(eq(taskTemplates.libraryVersionId, p.libraryVersionId))
     .all();
   const categories = projectConfig(ctx.db, p).categories.map((c) => `${c.code} ${c.name}`).join("; ");
+  const mapping = `Turn a research brief into website suggestions for a studio's project plan. Map each suggestion to task codes from this library where one fits (use only these codes):\n${library.map((l) => `${l.code} ${l.name}`).join("\n")}\nCategories for new tasks: ${categories}. New-task points: 1–10, roughly hours of work.`;
+  const briefText = `Research brief:\n${brief}\n\nSources seen:\n${[...sources.values()].map((s) => `${s.title} ${s.url}`).join("\n") || "(none: written without a live web search)"}`;
   let output: ResearchOutput;
-  try {
-    const res = await client.beta.messages.parse({
-      model: AI_MODEL,
+  if (provider === "openrouter") {
+    const res = await openRouterChat({ model: aiModel(), system: mapping, user: briefText, schema: ResearchSchema, prepare: tidyResearch }).catch((e: unknown) => {
+      if (e instanceof DomainError) return null;
+      throw e;
+    });
+    output = res?.parsed ?? { summary: "Could not turn the research into suggestions; the brief is still saved.", suggestions: [] };
+  } else try {
+    const res = await clientFactory().beta.messages.parse({
+      model,
       max_tokens: 16000,
       betas: [FALLBACK_BETA],
       fallbacks: "default",
       output_config: { effort: "low", format: betaZodOutputFormat(ResearchSchema) },
-      system: [
-        {
-          type: "text",
-          text: `Turn a research brief into website suggestions for a studio's project plan. Map each suggestion to task codes from this library where one fits (use only these codes):\n${library.map((l) => `${l.code} ${l.name}`).join("\n")}\nCategories for new tasks: ${categories}. New-task points: 1–10, roughly hours of work.`,
-          cache_control: { type: "ephemeral" },
-        },
-      ],
-      messages: [{ role: "user", content: `Research brief:\n${brief}\n\nSources seen:\n${[...sources.values()].map((s) => `${s.title} ${s.url}`).join("\n")}` }],
+      system: [{ type: "text", text: mapping, cache_control: { type: "ephemeral" } }],
+      messages: [{ role: "user", content: briefText }],
     });
     if (res.stop_reason === "refusal" || !res.parsed_output) throw new DomainError("conflict", "Could not turn the research into suggestions; the brief is still saved");
     output = res.parsed_output;
@@ -364,7 +450,7 @@ Then list what a new site for this business must have, should have and could hav
   return ctx.db.transaction((tx) => {
     const id = tx
       .insert(aiReports)
-      .values({ projectId, kind: "research", input, output: { ...output, brief, sources: [...sources.values()] }, model: AI_MODEL, createdBy: actor, createdAt: iso(ctx.now) })
+      .values({ projectId, kind: "research", input, output: { ...output, brief, sources: [...sources.values()], liveSearch }, model, createdBy: actor, createdAt: iso(ctx.now) })
       .returning({ id: aiReports.id })
       .get().id;
     audit(tx, ctx, "assistant.research", "ai_report", id, projectId, undefined, { niche, sources: sources.size, suggestions: output.suggestions.length });

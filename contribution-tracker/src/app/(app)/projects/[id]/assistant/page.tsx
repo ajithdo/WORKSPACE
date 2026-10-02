@@ -6,7 +6,7 @@ import { getDb } from "@/db";
 import { taskInstances } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { requireMember } from "@/lib/session";
-import { aiConfigured, reportsFor, type CompletionOutput, type ResearchOutput } from "@/server/assistant";
+import { aiConfigured, aiLiveSearch, aiName, reportsFor, type CompletionOutput, type ResearchOutput } from "@/server/assistant";
 import { loadProject } from "@/server/common";
 import { acceptAction, addLibraryAction, addNewTaskAction, completionCheckAction, researchAction, saveBriefAction, siteCheckAction } from "./actions";
 
@@ -22,6 +22,9 @@ export default async function AssistantPage({ params }: { params: Promise<{ id: 
   const p = loadProject(db, projectId);
   const open = p.closeStatus !== "closed_locked";
   const ai = aiConfigured();
+  const name = aiName();
+  const Name = name.charAt(0).toUpperCase() + name.slice(1);
+  const liveSearch = aiLiveSearch();
   const webhookOn = !!process.env.GITHUB_WEBHOOK_SECRET;
   const h = await headers();
   const origin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("x-forwarded-host") ?? h.get("host") ?? "your-server"}`;
@@ -51,7 +54,7 @@ export default async function AssistantPage({ params }: { params: Promise<{ id: 
   return (
     <>
       <Note>
-        The assistant suggests; you decide. Accepting a suggestion adds evidence and submits the task in your name, and your partner still verifies it before any points count. {ai ? "" : "Claude features are off until ANTHROPIC_API_KEY is set on the server; the site check below works without it."}
+        The assistant suggests; you decide. Accepting a suggestion adds evidence and submits the task in your name, and your partner still verifies it before any points count. {ai ? "" : "AI features are off until OPENROUTER_API_KEY (free models) or ANTHROPIC_API_KEY is set on the server; the site check below works without it."}
       </Note>
       {open ? (
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
@@ -61,16 +64,20 @@ export default async function AssistantPage({ params }: { params: Promise<{ id: 
               <SubmitButton variant="secondary">Run site check</SubmitButton>
             </ActionForm>
           </Section>
-          <Section title="What did we finish?" description="After a build session, Claude reads the site, your notes and the last two weeks of commits, and lists tasks that look done.">
+          <Section title="What did we finish?" description={`After a build session, ${name} reads the site, your notes and the last two weeks of commits, and lists tasks that look done.`}>
             <ActionForm action={completionCheckAction.bind(null, projectId)} className="space-y-2">
               <input className="field-input" name="url" defaultValue={defaultUrl} placeholder="https://staging.example.com" aria-label="Site address" />
               <Field label="Build notes" hint="Paste your AI coding tool's final summary, commit list or PR description. No secrets.">
                 <textarea className="field-input" name="notes" rows={4} />
               </Field>
-              <SubmitButton disabled={!ai}>Ask Claude</SubmitButton>
+              <SubmitButton disabled={!ai}>{name === "Claude" ? "Ask Claude" : "Check with AI"}</SubmitButton>
             </ActionForm>
           </Section>
-          <Section title="Research the niche" description="Claude searches the web for the best sites of this kind and suggests what to add.">
+          <Section title="Research the niche" description={
+              liveSearch
+                ? `${Name} searches the web for the best sites of this kind and suggests what to add.`
+                : "The AI describes the best sites of this kind from what it already knows (no live web search on the free plan) and suggests what to add. Check the example sites yourself."
+            }>
             <ActionForm action={researchAction.bind(null, projectId)} className="space-y-2">
               <input className="field-input" name="niche" placeholder="Bakery with custom cakes" required aria-label="Kind of business" />
               <input className="field-input" name="location" placeholder="City (optional)" aria-label="City" />
@@ -108,7 +115,7 @@ export default async function AssistantPage({ params }: { params: Promise<{ id: 
                     <Pill tone={t.verdict === "done" ? "verified" : t.verdict === "partly" ? "waiting" : "neutral"}>{t.verdict.replace("_", " ")}</Pill> <strong>{t.code}</strong> {byCode.get(t.code)?.name}{" "}
                     <span className="text-ink-faint">({t.confidence} confidence)</span>
                     <p className="text-ink-soft">{t.reason}</p>
-                    {t.verdict === "done" ? <Accept code={t.code} url={t.evidenceUrl} type={t.evidenceType ?? "url_live"} description={`Claude review: ${t.reason}`} /> : null}
+                    {t.verdict === "done" ? <Accept code={t.code} url={t.evidenceUrl} type={t.evidenceType ?? "url_live"} description={`AI review: ${t.reason}`} /> : null}
                   </li>
                 ))}
               </ul>
@@ -137,9 +144,10 @@ export default async function AssistantPage({ params }: { params: Promise<{ id: 
     </>
   );
 
-  function ResearchView({ report, reportId }: { report: ResearchOutput & { brief: string; sources: { url: string; title: string }[] }; reportId: number }) {
+  function ResearchView({ report, reportId }: { report: ResearchOutput & { brief: string; sources: { url: string; title: string }[]; liveSearch?: boolean }; reportId: number }) {
     return (
       <div className="space-y-3">
+        {report.liveSearch === false ? <Note tone="waiting">Written from the AI model&apos;s own knowledge, without a live web search. Open the example sites and check them before relying on them.</Note> : null}
         <p>{report.summary}</p>
         <ul className="divide-y divide-rule text-sm">
           {report.suggestions.map((s, i) => (

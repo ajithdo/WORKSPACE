@@ -138,7 +138,7 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 
 35. **Safe upgrades.** When an updated app starts on an existing database with pending migrations, it first writes a consistent copy (`VACUUM INTO`) to `DATA_DIR/backups/pre-upgrade-<time>.db`. A bad upgrade can always be rolled back by restoring that file.
 
-AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
+AI features are optional and switched on by a key in the server's `.env`: `OPENROUTER_API_KEY` for OpenRouter's free models, or `ANTHROPIC_API_KEY` for Claude. Without a key, everything except features 14 and 15 works. With OpenRouter, answers are parsed leniently (fenced JSON, missing nullable fields, "not done" for "not_done"), and the niche research runs without live web search unless `OPENROUTER_WEB_SEARCH=true`, because OpenRouter bills each search. The research report records whether it used live search, and the page says so when it didn't.
 
 ## Screens
 
