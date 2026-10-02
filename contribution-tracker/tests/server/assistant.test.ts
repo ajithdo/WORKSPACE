@@ -95,3 +95,19 @@ describe("site addresses and fetch guard", () => {
     expect(blockedAddress("93.184.216.34")).toBe(false);
   });
 });
+
+describe("daily limit", () => {
+  it("stops Claude requests once the day's limit is used", async () => {
+    const f = bootstrap();
+    process.env.AI_DAILY_LIMIT = "1";
+    try {
+      setAiClientFactory(fakeClient({ summary: "ok", tasks: [] }));
+      await runCompletionCheck(f.at(f.a), f.projectId, { url: null, notes: "Built the home page" });
+      await expect(runCompletionCheck(f.at(f.a), f.projectId, { url: null, notes: "Built the about page" })).rejects.toThrow(/limit of 1/);
+      // The next day starts fresh.
+      await runCompletionCheck(f.at(f.a, new Date(Date.parse("2026-10-03T09:00:00Z"))), f.projectId, { url: null, notes: "Built the contact page" });
+    } finally {
+      delete process.env.AI_DAILY_LIMIT;
+    }
+  });
+});

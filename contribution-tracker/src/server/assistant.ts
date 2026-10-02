@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, gte, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { analyseSite, type SiteCheck } from "@/domain/siteRules";
 import { aiReports, projects, taskInstances, taskTemplates } from "@/db/schema";
@@ -143,12 +143,32 @@ For each task, decide whether the material shows it is done. Be conservative:
 - Quote or name what you saw in "reason". Do not invent URLs: evidenceUrl must appear in the material, or be null.
 Only list tasks you can say something useful about; skip tasks the material does not touch.`;
 
+/** Claude calls allowed per day across the studio (completion checks + research). 0 turns the cap off. */
+export function aiDailyLimit(): number {
+  const n = Number(process.env.AI_DAILY_LIMIT ?? 20);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 20;
+}
+
+/** Keeps a busy day from running up an unexpected bill. Site checks are free and not counted. */
+export function assertAiBudget(ctx: Ctx) {
+  const limit = aiDailyLimit();
+  if (!limit) return;
+  const since = iso(ctx.now).slice(0, 10) + "T00:00:00.000Z";
+  const used = ctx.db
+    .select({ id: aiReports.id })
+    .from(aiReports)
+    .where(and(inArray(aiReports.kind, ["completion", "research"]), gte(aiReports.createdAt, since)))
+    .all().length;
+  if (used >= limit) throw new DomainError("conflict", `Today's limit of ${limit} Claude requests is used up (set AI_DAILY_LIMIT on the server to change it). The free site check still works.`);
+}
+
 export async function runCompletionCheck(ctx: Ctx, projectId: number, input: { url: string | null; notes: string }): Promise<{ reportId: number }> {
   const actor = requireActor(ctx);
   if (!aiConfigured()) throw new DomainError("conflict", "AI is off: set ANTHROPIC_API_KEY on the server to use the completion check");
   const p = loadProject(ctx.db, projectId);
   assertProjectOpen(p);
   assertProjectMember(ctx.db, projectId, actor);
+  assertAiBudget(ctx);
   const tasks = openTasks(ctx, projectId);
   if (!tasks.length) throw new DomainError("conflict", "No open tasks to check");
   const notes = input.notes.trim().slice(0, 40_000);
@@ -257,6 +277,7 @@ export async function runResearch(ctx: Ctx, projectId: number, input: { niche: s
   const p = loadProject(ctx.db, projectId);
   assertProjectOpen(p);
   assertProjectMember(ctx.db, projectId, actor);
+  assertAiBudget(ctx);
   const client = clientFactory();
   const ask = `Research the best websites for this kind of business: ${niche}${input.location ? `, in or near ${input.location}` : ""}.
 ${input.focus ? `Focus: ${input.focus}.\n` : ""}Find 5–8 strong, current examples (local and international). For each pattern you see repeatedly, explain what the sites do and why it helps customers or conversions.

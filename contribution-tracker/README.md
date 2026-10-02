@@ -17,7 +17,7 @@ cp .env.example .env          # edit COOKIE_SECURE / ANTHROPIC_API_KEY if needed
 docker compose up -d --build  # http://your-server:3000
 ```
 
-The first visit opens the setup wizard, where you enter the studio details and both partners' sign-ins. Everything the app keeps is in `./data`: the database `app.db` and uploaded evidence in `files/`. Back that folder up.
+The container reports its health at `/health`, and Docker restarts it if the check fails. The first visit opens the setup wizard, where you enter the studio details and both partners' sign-ins. Everything the app keeps is in `./data`: the database `app.db` and uploaded evidence in `files/`. Back that folder up.
 
 Put the app behind HTTPS (for example Caddy or nginx with Let's Encrypt), then set `COOKIE_SECURE=true`.
 
@@ -64,7 +64,7 @@ Each project has two extra tabs.
 
 The assistant only suggests. Accepting a suggestion adds evidence and submits the task in your name, and the other partner still verifies it before any points count.
 
-Claude features need an Anthropic API key. Create one at https://console.anthropic.com, put it in `.env` as `ANTHROPIC_API_KEY=…` on the server only, and restart the app. Never put the key in the app, in evidence, or in chat. You can tune the assistant with `AI_MODEL` and `AI_EFFORT` (`low` / `medium` / `high`).
+Claude features need an Anthropic API key. Create one at https://console.anthropic.com, put it in `.env` as `ANTHROPIC_API_KEY=…` on the server only, and restart the app. Never put the key in the app, in evidence, or in chat. You can tune the assistant with `AI_MODEL` and `AI_EFFORT` (`low` / `medium` / `high`). `AI_DAILY_LIMIT` (default 20) caps Claude requests per day, so a busy day can't run up an unexpected bill.
 
 The server refuses to fetch loopback, link-local (cloud metadata) and multicast addresses, so the site check works on staging and live addresses, not on `localhost`.
 
