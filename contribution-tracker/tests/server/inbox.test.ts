@@ -47,3 +47,13 @@ describe("TDS certificate follow-up", () => {
     expect(tds("2026-12-01T00:00:00Z")).toHaveLength(0);
   });
 });
+
+describe("studio identifiers", () => {
+  it("rejects a malformed Udyam number and normalises a valid one", async () => {
+    const { updateStudio, getStudio } = await import("@/server/settings");
+    const f = bootstrap();
+    expect(() => updateStudio(f.at(f.a), { udyamNumber: "12345" })).toThrow(/UDYAM-TS-02-0012345/);
+    updateStudio(f.at(f.a), { udyamNumber: " udyam-ts-02-0012345 " });
+    expect(getStudio(f.db)?.udyamNumber).toBe("UDYAM-TS-02-0012345");
+  });
+});

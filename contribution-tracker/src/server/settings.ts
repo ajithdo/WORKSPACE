@@ -25,6 +25,10 @@ export function updateStudio(
     const state = patch.stateCode ?? before.stateCode;
     const problem = gstin ? gstinProblem(gstin, state) : null;
     if (problem) throw new DomainError("invalid", problem);
+    if (patch.udyamNumber && !/^UDYAM-[A-Z]{2}-\d{2}-\d{7}$/.test(patch.udyamNumber.trim().toUpperCase())) {
+      throw new DomainError("invalid", "Udyam numbers look like UDYAM-TS-02-0012345");
+    }
+    if (patch.udyamNumber !== undefined) patch = { ...patch, udyamNumber: patch.udyamNumber.trim().toUpperCase() };
     const next = { ...patch, gstin, updatedAt: iso(ctx.now) };
     tx.update(studio).set(next).where(eq(studio.id, 1)).run();
     audit(tx, ctx, "studio.update", "studio", 1, null, before, next);
