@@ -20,6 +20,8 @@ COPY --from=build --chown=app /app/.next/static ./.next/static
 COPY --from=build --chown=app /app/drizzle ./drizzle
 COPY --from=build --chown=app /app/seed ./seed
 COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+# A Windows checkout can turn LF into CRLF, which breaks the #!/bin/sh line.
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh
 VOLUME ["/data"]
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \

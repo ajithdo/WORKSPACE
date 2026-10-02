@@ -13,7 +13,7 @@ export async function siteCheckAction(projectId: number, _p: ActionState, fd: Fo
   return runAction((ctx) => runSiteCheck(ctx, projectId, optStr(fd, "url")), "Site checked");
 }
 export async function completionCheckAction(projectId: number, _p: ActionState, fd: FormData) {
-  return runAction((ctx) => runCompletionCheck(ctx, projectId, { url: optStr(fd, "url"), notes: str(fd, "notes") }), "Claude reviewed the build");
+  return runAction((ctx) => runCompletionCheck(ctx, projectId, { url: optStr(fd, "url"), notes: str(fd, "notes") }), "The build was reviewed");
 }
 export async function researchAction(projectId: number, _p: ActionState, fd: FormData) {
   return runAction((ctx) => runResearch(ctx, projectId, { niche: str(fd, "niche"), location: str(fd, "location"), focus: str(fd, "focus") }), "Research ready");
