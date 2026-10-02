@@ -160,3 +160,20 @@
     border-color: var(--color-ledger);
   }
 }
+
+/* Printable documents (invoice, statements): print only the document, not the app around it. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    inset: 0 0 auto 0;
+    max-width: none;
+    padding: 0 12mm;
+  }
+}

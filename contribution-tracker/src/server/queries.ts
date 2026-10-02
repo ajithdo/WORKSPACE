@@ -1,6 +1,7 @@
 import { and, desc, eq, inArray } from "drizzle-orm";
 import type { AppDb } from "@/db";
-import { clients, members, projectMembers, projects, taskInstances } from "@/db/schema";
+import { approvalVotes, categoryTemplates, clients, members, projectMembers, projects, taskContributions, taskInstances, taskTemplates } from "@/db/schema";
+import { PHASES } from "@/domain/types";
 import { loadProject, projectConfig, projectMemberIds } from "./common";
 import { projectMilestones } from "./milestones";
 
@@ -68,9 +69,6 @@ export function isProjectMember(db: AppDb, projectId: number, memberId: number) 
     .where(and(eq(projectMembers.projectId, projectId), eq(projectMembers.memberId, memberId), eq(projectMembers.active, true)))
     .get();
 }
-
-import { approvalVotes, categoryTemplates, taskContributions, taskTemplates } from "@/db/schema";
-import { PHASES } from "@/domain/types";
 
 export function planView(db: AppDb, projectId: number) {
   const p = loadProject(db, projectId);

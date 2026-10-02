@@ -9,6 +9,7 @@ import { taskContributions, taskInstances } from "@/db/schema";
 import { isSetUp, setupStudio } from "@/server/auth";
 import type { Ctx } from "@/server/context";
 import { addEvidence } from "@/server/evidence";
+import { createInvoice, issueInvoice } from "@/server/finance";
 import { approvePlan, submitPlan } from "@/server/plan";
 import { createProject } from "@/server/projects";
 import { startTask, submitTask, verifyTask } from "@/server/tasks";
@@ -61,4 +62,7 @@ function complete(code: string) {
 for (const code of ["H-05", "I-02"]) complete(code);
 submitPlan(ctx(a), projectId);
 approvePlan(ctx(b), projectId);
+const today = new Date().toISOString().slice(0, 10);
+const { invoiceId } = createInvoice(ctx(b), projectId, { type: "advance", issueDate: today, dueDate: today, amountExGst: 3_000_000, tdsExpectedRateBp: 200});
+issueInvoice(ctx(b), invoiceId);
 console.log(`Demo studio ready: project ${projectId}, plan locked, gate 1 open.`);

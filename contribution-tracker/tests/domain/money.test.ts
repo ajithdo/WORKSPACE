@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  amountInWordsINR,
   financialYearLabel,
   formatINR,
   formatInvoiceNumber,
@@ -99,5 +100,14 @@ describe("MSME and invoice numbering", () => {
     expect(formatInvoiceNumber("INV", "26-27", 7)).toBe("INV/26-27/007");
     expect(formatInvoiceNumber("INV", "26-27", 1234)).toBe("INV/26-27/1234");
     expect(() => formatInvoiceNumber("STUDIOINVOICE", "26-27", 1)).toThrow(/16/);
+  });
+});
+
+describe("amountInWordsINR", () => {
+  it("uses lakh and crore", () => {
+    expect(amountInWordsINR(7_080_000)).toBe("Rupees Seventy Thousand Eight Hundred Only");
+    expect(amountInWordsINR(1_234_567_89)).toBe("Rupees Twelve Lakh Thirty Four Thousand Five Hundred Sixty Seven and Eighty Nine Paise Only");
+    expect(amountInWordsINR(2_50_00_000_00)).toBe("Rupees Two Crore Fifty Lakh Only");
+    expect(amountInWordsINR(100)).toBe("Rupees One Only");
   });
 });

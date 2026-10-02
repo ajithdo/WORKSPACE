@@ -92,3 +92,30 @@ export function formatInvoiceNumber(prefix: string, fyLabel: string, seq: number
   if (n.length > 16) throw new Error(`Invoice number "${n}" is longer than the 16 characters GST allows; use a shorter prefix`);
   return n;
 }
+
+const ONES = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+const TENS = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+function below1000(n: number): string {
+  const h = Math.floor(n / 100);
+  const r = n % 100;
+  const rest = r < 20 ? ONES[r]! : `${TENS[Math.floor(r / 10)]}${r % 10 ? ` ${ONES[r % 10]}` : ""}`;
+  return [h ? `${ONES[h]} Hundred` : "", rest].filter(Boolean).join(" ");
+}
+
+/** Whole numbers in the Indian system (thousand, lakh, crore), as printed on invoices. */
+function indianWords(n: number): string {
+  if (n === 0) return "Zero";
+  const crore = Math.floor(n / 10_000_000);
+  const lakh = Math.floor((n % 10_000_000) / 100_000);
+  const thousand = Math.floor((n % 100_000) / 1000);
+  const rest = n % 1000;
+  return [crore ? `${indianWords(crore)} Crore` : "", lakh ? `${below1000(lakh)} Lakh` : "", thousand ? `${below1000(thousand)} Thousand` : "", rest ? below1000(rest) : ""].filter(Boolean).join(" ");
+}
+
+/** "Rupees Seventy Thousand Eight Hundred Only", with paise when present. */
+export function amountInWordsINR(paise: number): string {
+  const rupees = Math.floor(Math.abs(paise) / 100);
+  const p = Math.abs(paise) % 100;
+  return `${paise < 0 ? "Minus " : ""}Rupees ${indianWords(rupees)}${p ? ` and ${below1000(p)} Paise` : ""} Only`;
+}

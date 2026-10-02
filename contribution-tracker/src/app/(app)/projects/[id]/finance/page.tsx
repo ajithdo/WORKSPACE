@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { desc, eq } from "drizzle-orm";
 import { ActionButton, ActionForm, SubmitButton } from "@/components/forms";
 import { Empty, Field, formatDate, KeyValue, Money, Note, Pill, Section, Stamp } from "@/components/ui";
@@ -102,7 +103,9 @@ export default async function FinancePage({ params }: { params: Promise<{ id: st
             return (
               <li key={inv.id} className="py-4">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-bold">{inv.number ?? "Draft"}</span>
+                  <Link href={`/projects/${projectId}/invoice/${inv.id}`} className="font-bold text-royal hover:underline">
+                    {inv.number ?? "Draft"}
+                  </Link>
                   <Pill>{inv.type.replace("_", " ")}</Pill>
                   {inv.status === "paid" ? <Stamp tone="verified">Paid</Stamp> : <Pill tone={inv.status === "cancelled" ? "neutral" : inv.status === "draft" ? "neutral" : "waiting"}>{inv.status.replace("_", " ")}</Pill>}
                   {overdue ? <Pill tone="ledger">Overdue</Pill> : null}

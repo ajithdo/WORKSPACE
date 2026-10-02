@@ -24,7 +24,7 @@ export default async function StatementPage({ params }: { params: Promise<{ id: 
   const params_ = s.params as CalcParams;
   const name = (mid: string) => members.find((m) => String(m.id) === mid)?.name ?? mid;
   return (
-    <article className="mx-auto max-w-3xl text-[15px]">
+    <article className="print-area mx-auto max-w-3xl text-[15px]">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <p className="text-sm text-ink-soft">{studio?.legalName || studio?.name}</p>

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { formatDate, KeyValue, Money, Note, Points, Section } from "@/components/ui";
 import { getDb } from "@/db";
-import { taskInstances } from "@/db/schema";
+import { configVersions, taskInstances } from "@/db/schema";
 import { stateName } from "@/lib/states";
 import { requireMember } from "@/lib/session";
 import { loadProject } from "@/server/common";
@@ -112,7 +112,7 @@ export default async function ProjectOverview({ params }: { params: Promise<{ id
                 ["GST", p.gstRegistered ? `${p.gstRateBp / 100}% (SAC ${p.sacCode})` : "Not charged"],
                 ["Start", formatDate(p.startDate)],
                 ["Target launch", formatDate(p.targetLaunchDate)],
-                ["Rules version", `v${p.configVersionId}`],
+                ["Rules version", `v${db.select({ v: configVersions.version }).from(configVersions).where(eq(configVersions.id, p.configVersionId)).get()?.v ?? "?"}`],
               ]}
             />
           </Section>

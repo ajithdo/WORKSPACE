@@ -56,8 +56,10 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 14. **"What did we finish?" (Claude).** After a build session, Claude reads the site check and the partner's notes and lists the open tasks that look done, with confidence and reasons. Accepting a suggestion adds evidence and submits the task in the accepting partner's name. It **never verifies**: the other partner still checks it (principle 3). Every AI report is stored with its model and inputs.
 15. **Niche research (Claude with web search).** Claude searches for the best sites in the client's niche and location and suggests what to add or improve. Each suggestion is mapped to a library task, or proposed as a new task (which goes through normal proposal approval). Sources are kept, and the research can be saved as evidence (for example for discovery task I-02).
 
+16. **Printable GST tax invoice.** Each invoice opens as a print-ready page (save as PDF from the browser). It carries the particulars rule 46 of the CGST Rules asks for: supplier and recipient names, addresses and GSTINs, serial number, date, place of supply, SAC 998314, taxable value, CGST+SGST or IGST with rates, total, amount in words (Indian lakh/crore system), reverse-charge status and a signature block. It also includes a TDS certificate request and the MSME 45-day notice. Drafts are watermarked and have no number, so the GST series stays gapless.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens
 
-`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/assistant` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.
+`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/invoice/[invoiceId]` · `…/assistant` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.
