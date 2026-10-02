@@ -34,6 +34,8 @@ export interface StoreFileInput {
   mime: string;
   bytes: Uint8Array;
   visibility?: "internal" | "client_shared";
+  /** Late paperwork for a closed project (a Form 16A); files are append-only, so nothing locked changes. */
+  allowClosedProject?: boolean;
 }
 
 /** Content-addressed storage: identical uploads share one copy on disk; every upload gets its own row and hash. */
@@ -55,7 +57,7 @@ export function storeFile(ctx: Ctx, input: StoreFileInput): { fileId: number; sh
     let category = input.category;
     if (input.projectId !== null) {
       const p = loadProject(tx, input.projectId);
-      assertProjectOpen(p);
+      if (!input.allowClosedProject) assertProjectOpen(p);
       assertProjectMember(tx, p.id, actor);
       const cats = projectConfig(tx, p).file_categories.map((c) => c.code);
       if (!cats.includes(category)) category = "11_internal";

@@ -207,10 +207,11 @@ export function recordTdsCertificate(ctx: Ctx, paymentId: number, input: { fileI
   ctx.db.transaction((tx) => {
     const pay = tx.select().from(payments).where(eq(payments.id, paymentId)).get();
     if (!pay) throw new DomainError("not_found", "Payment not found");
+    // Allowed after closure too: certificates arrive late, and the database permits only this change.
     const p = loadProject(tx, pay.projectId);
-    assertProjectOpen(p);
     assertProjectMember(tx, p.id, actor);
     if (pay.tdsDeducted <= 0) throw new DomainError("invalid", "No TDS was deducted on this payment");
+    if (pay.tdsCertificateStatus !== "pending") throw new DomainError("conflict", "The certificate for this payment is already recorded");
     tx.update(payments).set({ tdsCertificateStatus: "received", tdsCertificateFileId: input.fileId ?? null }).where(eq(payments.id, paymentId)).run();
     audit(tx, ctx, "payment.tds_certificate", "payment", paymentId, p.id, { status: pay.tdsCertificateStatus }, { status: "received", fileId: input.fileId ?? null });
   });

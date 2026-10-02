@@ -185,7 +185,7 @@ export default async function FinancePage({ params }: { params: Promise<{ id: st
                             ) : (
                               <span className="text-ink-faint">Waiting for partner</span>
                             )}
-                            {open && x.tdsDeducted > 0 && x.tdsCertificateStatus === "pending" ? (
+                            {x.tdsDeducted > 0 && x.tdsCertificateStatus === "pending" ? (
                               <ActionForm action={tdsCertificateAction.bind(null, x.id, projectId)} className="mt-1 flex items-center gap-1">
                                 <input type="file" name="file" className="w-36 text-xs" aria-label="TDS certificate (Form 16A)" />
                                 <SubmitButton variant="quiet" size="sm">

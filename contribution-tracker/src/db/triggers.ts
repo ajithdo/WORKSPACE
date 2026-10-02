@@ -23,6 +23,9 @@ const DIRECT = [
   "handover_items",
 ];
 
+/** Every payments column except the TDS certificate pair. */
+const PAYMENT_FROZEN_COLUMNS = ["id", "invoice_id", "project_id", "received_date", "amount_received", "tds_deducted", "gst_component", "revenue_ex_gst", "bank_reference", "mode", "recorded_by", "recorded_at", "verified_by", "verified_at", "notes"];
+
 /** Tables that reach their project through a parent row. */
 const VIA_PARENT: { table: string; project: (row: "NEW" | "OLD") => string }[] = [
   { table: "task_contributions", project: (r) => `(SELECT project_id FROM task_instances WHERE id = ${r}.task_instance_id)` },
@@ -51,6 +54,16 @@ export function triggerStatements(): string[] {
   ];
   for (const t of DIRECT) {
     s.push(`CREATE TRIGGER IF NOT EXISTS ${t}_closed_no_insert BEFORE INSERT ON ${t} WHEN ${CLOSED("NEW.project_id")} ${abort("project is closed and locked")}`);
+    if (t === "payments") {
+      // Form 16A often arrives months after closure: the only change allowed on a closed project's
+      // payment is recording that certificate (pending → received), with every other column unchanged.
+      s.push(`DROP TRIGGER IF EXISTS payments_closed_no_update`);
+      s.push(
+        `CREATE TRIGGER IF NOT EXISTS payments_closed_no_update_v2 BEFORE UPDATE ON payments WHEN ${CLOSED("OLD.project_id")} AND NOT (OLD.tds_certificate_status = 'pending' AND NEW.tds_certificate_status = 'received' AND ${PAYMENT_FROZEN_COLUMNS.map((c) => `NEW.${c} IS OLD.${c}`).join(" AND ")}) ${abort("project is closed and locked")}`,
+      );
+      s.push(`CREATE TRIGGER IF NOT EXISTS ${t}_closed_no_delete BEFORE DELETE ON ${t} WHEN ${CLOSED("OLD.project_id")} ${abort("project is closed and locked")}`);
+      continue;
+    }
     s.push(`CREATE TRIGGER IF NOT EXISTS ${t}_closed_no_update BEFORE UPDATE ON ${t} WHEN ${CLOSED("OLD.project_id")} ${abort("project is closed and locked")}`);
     s.push(`CREATE TRIGGER IF NOT EXISTS ${t}_closed_no_delete BEFORE DELETE ON ${t} WHEN ${CLOSED("OLD.project_id")} ${abort("project is closed and locked")}`);
   }

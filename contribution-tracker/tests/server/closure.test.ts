@@ -18,7 +18,7 @@ import { proposeCustomTask, updatePlannedTask } from "@/server/plan";
 import { bootstrap, completeTask, type Fixture } from "../fixtures";
 
 /** A custom project reproducing the spec's worked example from real rows. */
-function workedExample(): Fixture {
+function workedExample(opts: { tds?: boolean } = {}): Fixture {
   const f = bootstrap({ projectType: "custom", originatedBy: null });
   proposeCustomTask(f.at(f.a), f.projectId, { name: "Build all pages", categoryCode: "V", defaultPoints: 130, ownerMemberId: f.a });
   proposeCustomTask(f.at(f.b), f.projectId, { name: "UI design", categoryCode: "S", defaultPoints: 90, ownerMemberId: f.b });
@@ -26,7 +26,7 @@ function workedExample(): Fixture {
   completeTask(f, "S-X01");
   const { invoiceId } = createInvoice(f.at(f.a), f.projectId, { type: "final", issueDate: "2026-10-01", dueDate: "2026-10-15", amountExGst: 6_000_000 });
   issueInvoice(f.at(f.a), invoiceId);
-  const { paymentId } = recordPayment(f.at(f.a), invoiceId, { receivedDate: "2026-10-05", amountReceived: 7_080_000, tdsDeducted: 0, bankReference: "UTR123", mode: "bank" });
+  const { paymentId } = recordPayment(f.at(f.a), invoiceId, { receivedDate: "2026-10-05", amountReceived: opts.tds ? 6_480_000 : 7_080_000, tdsDeducted: opts.tds ? 600_000 : 0, bankReference: "UTR123", mode: "bank" });
   verifyPayment(f.at(f.b), paymentId);
   const { expenseId } = addExpense(f.at(f.b), { projectId: f.projectId, expenseDate: "2026-10-02", vendor: "ThemeForest", description: "Theme and stock photos", amount: 600_000, paidByMemberId: f.b, reimbursable: true });
   approveExpense(f.at(f.a), expenseId);
@@ -128,5 +128,21 @@ describe("year summary", () => {
     expect(a.projects).toBe(1);
     expect(y.studio).toMatchObject({ invoicedExGst: 6_000_000, cashReceived: 7_080_000, revenueExGst: 6_000_000, expenses: 600_000, reserveIn: 540_000 });
     expect(yearSummary(f.db, "25-26").partners.every((p) => p.total === 0)).toBe(true);
+  });
+});
+
+describe("late TDS certificate", () => {
+  it("can be recorded after the project is closed, and nothing else on the payment can change", async () => {
+    const { payments } = await import("@/db/schema");
+    const { recordTdsCertificate } = await import("@/server/finance");
+    const f = workedExample({ tds: true });
+    closeAndLock(f);
+    const pay = f.db.select().from(payments).where(eq(payments.projectId, f.projectId)).get()!;
+    expect(pay.tdsCertificateStatus).toBe("pending");
+    expect(() => f.db.update(payments).set({ amountReceived: 1 }).where(eq(payments.id, pay.id)).run()).toThrow(/closed and locked/);
+    recordTdsCertificate(f.at(f.b), pay.id, {});
+    expect(f.db.select().from(payments).where(eq(payments.id, pay.id)).get()?.tdsCertificateStatus).toBe("received");
+    expect(() => recordTdsCertificate(f.at(f.b), pay.id, {})).toThrow(/already recorded/);
+    expect(() => f.db.update(payments).set({ tdsCertificateStatus: "pending" }).where(eq(payments.id, pay.id)).run()).toThrow(/closed and locked/);
   });
 });

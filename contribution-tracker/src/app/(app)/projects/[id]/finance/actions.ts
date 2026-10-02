@@ -63,7 +63,7 @@ export async function tdsCertificateAction(id: number, projectId: number, _p: Ac
   return runAction(async (ctx) => {
     let fileId: number | null = null;
     const file = fd.get("file");
-    if (file instanceof File && file.size > 0) fileId = storeFile(ctx, { projectId, category: "09_finance", name: file.name, mime: file.type, bytes: new Uint8Array(await file.arrayBuffer()) }).fileId;
+    if (file instanceof File && file.size > 0) fileId = storeFile(ctx, { projectId, category: "09_finance", name: file.name, mime: file.type, bytes: new Uint8Array(await file.arrayBuffer()), allowClosedProject: true }).fileId;
     recordTdsCertificate(ctx, id, { fileId });
   }, "TDS certificate recorded");
 }
