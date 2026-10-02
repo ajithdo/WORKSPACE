@@ -32,10 +32,17 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   if (!inv || inv.projectId !== Number(id)) notFound();
   const { project: p, client } = projectHeader(db, inv.projectId);
   const studio = getStudio(db);
-  const gst = !!studio?.gstRegistered;
   const draft = !inv.number;
+  // Issued invoices print the details stored at issue; drafts (and invoices issued before that existed) use current ones.
+  const parties = inv.parties ?? {
+    supplier: { name: studio?.legalName || studio?.name || "", address: studio?.address ?? "", gstin: studio?.gstin ?? "", stateCode: studio?.stateCode ?? "", udyamNumber: studio?.udyamNumber ?? "", gstRegistered: !!studio?.gstRegistered, msmeRegistered: !!studio?.msmeRegistered },
+    recipient: { name: client?.businessName ?? "", address: client?.address ?? "", gstin: client?.gstin ?? "", stateCode: client?.stateCode ?? "", contactName: client?.contactName ?? "" },
+    placeOfSupply: p.placeOfSupplyState || client?.stateCode || "",
+  };
+  const { supplier, recipient } = parties;
+  const gst = supplier.gstRegistered;
   const rate = inv.gstRateBp / 100;
-  const supplyState = p.placeOfSupplyState || client?.stateCode || "";
+  const supplyState = parties.placeOfSupply;
   const kind = INVOICE_KIND[inv.type] ?? inv.type.replace(/_/g, " ");
   const description = `${kind}: website design and development, ${p.name}${inv.milestoneCode ? ` (milestone ${inv.milestoneCode})` : ""}`;
   return (
@@ -47,11 +54,13 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
       {draft ? <p className="mb-3 rounded border border-ledger px-3 py-1 text-center font-bold uppercase tracking-wide text-ledger">Draft, not a valid invoice</p> : null}
       <header className="flex flex-wrap items-start justify-between gap-4 border-b-2 border-ink pb-4">
         <div>
-          <h2 className="text-xl font-bold">{studio?.legalName || studio?.name}</h2>
-          {studio?.address ? <p className="whitespace-pre-line text-sm">{studio.address}</p> : null}
-          <p className="text-sm">State: {stateName(studio?.stateCode ?? "")} ({studio?.stateCode})</p>
-          {studio?.gstin ? <p className="text-sm">GSTIN: {studio.gstin}</p> : null}
-          {studio?.msmeRegistered && studio.udyamNumber ? <p className="text-sm">Udyam: {studio.udyamNumber}</p> : null}
+          <h2 className="text-xl font-bold">{supplier.name}</h2>
+          {supplier.address ? <p className="whitespace-pre-line text-sm">{supplier.address}</p> : null}
+          <p className="text-sm">
+            State: {stateName(supplier.stateCode)} ({supplier.stateCode})
+          </p>
+          {supplier.gstin ? <p className="text-sm">GSTIN: {supplier.gstin}</p> : null}
+          {supplier.msmeRegistered && supplier.udyamNumber ? <p className="text-sm">Udyam: {supplier.udyamNumber}</p> : null}
         </div>
         <div className="text-right">
           <h3 className="text-2xl font-bold uppercase tracking-wide">{gst ? "Tax invoice" : "Invoice"}</h3>
@@ -65,9 +74,9 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
       <section className="grid gap-4 border-b border-rule py-4 sm:grid-cols-2">
         <div>
           <p className="text-xs font-bold uppercase tracking-wide text-ink-soft">Bill to</p>
-          <p className="font-bold">{client?.businessName ?? "—"}</p>
-          {client?.address ? <p className="whitespace-pre-line text-sm">{client.address}</p> : null}
-          {client?.gstin ? <p className="text-sm">GSTIN: {client.gstin}</p> : <p className="text-sm">Unregistered recipient</p>}
+          <p className="font-bold">{recipient.name || "—"}</p>
+          {recipient.address ? <p className="whitespace-pre-line text-sm">{recipient.address}</p> : null}
+          {recipient.gstin ? <p className="text-sm">GSTIN: {recipient.gstin}</p> : <p className="text-sm">Unregistered recipient</p>}
         </div>
         <div className="text-sm sm:text-right">
           <p>
@@ -129,13 +138,13 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         Amount in words: <strong>{amountInWordsINR(inv.total)}</strong>
       </p>
       {inv.tdsExpectedRateBp ? <p className="mt-1 text-sm">If you deduct TDS ({inv.tdsExpectedRateBp / 100}%), please share the TDS certificate (Form 16A) so we can claim the credit.</p> : null}
-      {studio?.msmeRegistered ? (
+      {supplier.msmeRegistered ? (
         <p className="mt-1 text-sm">We are a Udyam-registered micro or small enterprise. Under the MSMED Act 2006, payment is due within 45 days of acceptance, after which compound interest applies.</p>
       ) : null}
       {inv.notes ? <p className="mt-3 whitespace-pre-line text-sm">{inv.notes}</p> : null}
       <footer className="mt-12 flex justify-end">
         <div className="text-center text-sm">
-          <p>For {studio?.legalName || studio?.name}</p>
+          <p>For {supplier.name}</p>
           <div className="h-14" />
           <p className="border-t border-ink px-6 pt-1">Authorised signatory</p>
         </div>

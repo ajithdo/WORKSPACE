@@ -11,7 +11,7 @@ import { plannedTotal } from "@/server/contribution";
 import { financeSummary } from "@/server/finance";
 import { projectMilestones } from "@/server/milestones";
 import { memberNames, projectHeader } from "@/server/queries";
-import { updateDetailsAction } from "./actions";
+import { updateClientAction, updateDetailsAction } from "./actions";
 
 export default async function ProjectOverview({ params }: { params: Promise<{ id: string }> }) {
   await requireMember();
@@ -189,6 +189,47 @@ export default async function ProjectOverview({ params }: { params: Promise<{ id
                   </Field>
                   <div>
                     <SubmitButton variant="secondary">Save details</SubmitButton>
+                  </div>
+                </ActionForm>
+              </details>
+            ) : null}
+            {client ? (
+              <details className="mt-3">
+                <summary className="cursor-pointer text-sm font-semibold text-royal">Edit client details</summary>
+                <ActionForm action={updateClientAction.bind(null, client.id)} className="mt-3 grid gap-3 text-sm">
+                  <Field label="Business name">
+                    <input className="field-input" name="business_name" defaultValue={client.businessName} required />
+                  </Field>
+                  <Field label="Billing address" hint="Printed on invoices and quotations.">
+                    <textarea className="field-input" name="address" rows={3} defaultValue={client.address} />
+                  </Field>
+                  <Field label="State">
+                    <select className="field-input" name="state_code" defaultValue={client.stateCode}>
+                      <option value="">Not set</option>
+                      {INDIAN_STATES.map((st) => (
+                        <option key={st.code} value={st.code}>
+                          {st.name}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field label="GSTIN" hint="Leave empty for an unregistered client.">
+                    <input className="field-input uppercase" name="gstin" maxLength={15} defaultValue={client.gstin} />
+                  </Field>
+                  <Field label="Contact person">
+                    <input className="field-input" name="contact_name" defaultValue={client.contactName} />
+                  </Field>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="Email">
+                      <input className="field-input" type="email" name="contact_email" defaultValue={client.contactEmail} />
+                    </Field>
+                    <Field label="Phone / WhatsApp">
+                      <input className="field-input" type="tel" name="contact_phone" defaultValue={client.contactPhone} />
+                    </Field>
+                  </div>
+                  <p className="text-xs text-ink-faint">Changes apply to every project for this client. Issued invoices keep their number and amounts.</p>
+                  <div>
+                    <SubmitButton variant="secondary">Save client</SubmitButton>
                   </div>
                 </ActionForm>
               </details>

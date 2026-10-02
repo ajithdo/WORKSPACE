@@ -60,6 +60,8 @@ export function activeVersionIds(tx: DbOrTx): { libraryVersionId: number; config
   return { libraryVersionId: lib.id, configVersionId: cfg.id };
 }
 
+const GSTIN = /^[0-9]{2}[A-Z0-9]{13}$/;
+
 function nextProjectCode(tx: DbOrTx, now: Date): string {
   const year = now.getUTCFullYear();
   const last = tx
@@ -93,6 +95,9 @@ export function createProject(ctx: Ctx, input: CreateProjectInput): { projectId:
     let clientState = "";
     if (input.kind === "client") {
       if (clientId == null && input.newClient) {
+        const g = input.newClient.gstin?.trim().toUpperCase() ?? "";
+        if (g && !GSTIN.test(g)) throw new DomainError("invalid", "Client GSTIN must be 15 characters starting with the state code");
+        if (g && input.newClient.stateCode && g.slice(0, 2) !== input.newClient.stateCode) throw new DomainError("invalid", "The client GSTIN's first two digits must match the client's state");
         clientId = tx
           .insert(clients)
           .values({
@@ -329,4 +334,34 @@ export function updateProjectDetails(
 
 export function getProject(db: DbOrTx, projectId: number) {
   return loadProject(db, projectId);
+}
+
+
+/** Client contact and tax details (used on invoices, quotes and the WhatsApp/email buttons). */
+export function updateClient(
+  ctx: Ctx,
+  clientId: number,
+  patch: { businessName: string; stateCode: string; gstin: string; contactName: string; contactEmail: string; contactPhone: string; address: string },
+) {
+  requireActor(ctx);
+  const gstin = patch.gstin.trim().toUpperCase();
+  if (gstin && !GSTIN.test(gstin)) throw new DomainError("invalid", "GSTIN must be 15 characters starting with the state code");
+  if (gstin && patch.stateCode && gstin.slice(0, 2) !== patch.stateCode) throw new DomainError("invalid", "The GSTIN's first two digits must match the client's state");
+  const email = patch.contactEmail.trim();
+  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new DomainError("invalid", "Enter a valid email address");
+  ctx.db.transaction((tx) => {
+    const before = tx.select().from(clients).where(eq(clients.id, clientId)).get();
+    if (!before) throw new DomainError("not_found", "Client not found");
+    const next = {
+      businessName: nonEmpty(patch.businessName, "Client name"),
+      stateCode: patch.stateCode.trim(),
+      gstin,
+      contactName: patch.contactName.trim(),
+      contactEmail: email,
+      contactPhone: patch.contactPhone.trim(),
+      address: patch.address.trim(),
+    };
+    tx.update(clients).set(next).where(eq(clients.id, clientId)).run();
+    audit(tx, ctx, "client.update", "client", clientId, null, before, next);
+  });
 }

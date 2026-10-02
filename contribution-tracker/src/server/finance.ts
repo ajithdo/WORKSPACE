@@ -2,7 +2,7 @@ import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { findSecrets, SECRET_KIND_LABELS } from "@/domain/secrets";
 import { financialYearLabel, formatInvoiceNumber, msmeDueDate, paymentRevenue, splitGst } from "@/domain/money";
 import type { AppDb, DbOrTx } from "@/db";
-import { expenses, invoices, payments, reserveLedger, studio } from "@/db/schema";
+import { clients, expenses, invoices, payments, reserveLedger, studio, type InvoiceParties } from "@/db/schema";
 import type { Ctx } from "./context";
 import { iso, isoDate } from "./context";
 import { assertDate, assertProjectMember, assertProjectOpen, audit, loadProject, nonEmpty, projectConfig, requireActor } from "./common";
@@ -112,7 +112,13 @@ export function issueInvoice(ctx: Ctx, invoiceId: number): { number: string } {
       throw new DomainError("invalid", (e as Error).message);
     }
     const msme = st.msmeRegistered && p.msmeApplicable ? msmeDueDate(inv.dueDate, inv.acceptanceDate, projectConfig(tx, p).calculation.msme_payment_days) : null;
-    tx.update(invoices).set({ number, fyLabel: fy, seq, status: "sent", sentAt: iso(ctx.now), msmeDueDate: msme, updatedAt: iso(ctx.now) }).where(eq(invoices.id, invoiceId)).run();
+    const c = p.clientId ? tx.select().from(clients).where(eq(clients.id, p.clientId)).get() : undefined;
+    const parties: InvoiceParties = {
+      supplier: { name: st.legalName || st.name, address: st.address, gstin: st.gstin, stateCode: st.stateCode, udyamNumber: st.udyamNumber, gstRegistered: st.gstRegistered, msmeRegistered: st.msmeRegistered },
+      recipient: { name: c?.businessName ?? "", address: c?.address ?? "", gstin: c?.gstin ?? "", stateCode: c?.stateCode ?? "", contactName: c?.contactName ?? "" },
+      placeOfSupply: p.placeOfSupplyState || c?.stateCode || "",
+    };
+    tx.update(invoices).set({ number, fyLabel: fy, seq, status: "sent", sentAt: iso(ctx.now), msmeDueDate: msme, parties, updatedAt: iso(ctx.now) }).where(eq(invoices.id, invoiceId)).run();
     audit(tx, ctx, "invoice.issue", "invoice", invoiceId, p.id, { status: "draft" }, { status: "sent", number, msmeDueDate: msme });
     return { number };
   });

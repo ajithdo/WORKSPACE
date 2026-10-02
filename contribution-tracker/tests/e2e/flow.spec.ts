@@ -80,6 +80,18 @@ test("setup → create project → both partners lock the plan → task done and
   await page.goto(projectPath + "/assistant");
   await expect(page.getByText(/ANTHROPIC_API_KEY/).first()).toBeVisible();
 
+  // A rejected form keeps what was typed (React would otherwise clear it).
+  await page.goto(projectPath);
+  await page.getByText("Edit client details").click();
+  await page.fill('textarea[name="address"]', "12 Bakery Lane, Hyderabad");
+  await page.fill('input[name="gstin"]', "29AAACS1234A1Z5");
+  await page.getByRole("button", { name: "Save client" }).click();
+  await expect(page.getByText(/match the client's state/)).toBeVisible();
+  await expect(page.locator('textarea[name="address"]')).toHaveValue("12 Bakery Lane, Hyderabad");
+  await page.fill('input[name="gstin"]', "36AAACS1234A1Z5");
+  await page.getByRole("button", { name: "Save client" }).click();
+  await expect(page.getByText("Client details saved")).toBeVisible();
+
   // Client update and the yearly summary render.
   await page.goto(projectPath + "/report");
   await expect(page.getByText("Message for the client (edit before sending)")).toBeVisible();

@@ -1,10 +1,13 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { createContext, startTransition, useActionState, useContext, useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import type { ActionState } from "@/lib/actions";
 
 type Action = (state: ActionState, formData: FormData) => Promise<ActionState>;
+
+/** Pending state of the surrounding ActionForm (it submits manually, so useFormStatus alone does not see it). */
+const FormPending = createContext(false);
 
 export function ActionForm({
   action,
@@ -21,14 +24,27 @@ export function ActionForm({
   showSuccess?: boolean;
   id?: string;
 }) {
-  const [state, formAction] = useActionState(action, null);
+  const [state, formAction, pending] = useActionState(action, null);
   const ref = useRef<HTMLFormElement>(null);
   useEffect(() => {
     if (state?.ok && resetOnSuccess) ref.current?.reset();
   }, [state, resetOnSuccess]);
   return (
-    <form ref={ref} action={formAction} className={className} id={id}>
-      {children}
+    <form
+      ref={ref}
+      action={formAction}
+      className={className}
+      id={id}
+      // Once the page is interactive, submit by hand: React then does not clear the form, so a
+      // rejected entry keeps what the user typed. Before that, the action attribute still works.
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (pending) return;
+        const fd = new FormData(e.currentTarget, (e.nativeEvent as SubmitEvent).submitter);
+        startTransition(() => formAction(fd));
+      }}
+    >
+      <FormPending value={pending}>{children}</FormPending>
       {state?.error ? (
         <p role="alert" className="mt-2 rounded-md border border-ledger/30 bg-ledger-wash px-3 py-2 text-sm text-ledger">
           {state.error}
@@ -69,7 +85,9 @@ export function SubmitButton({
   size?: "sm" | "md";
   disabled?: boolean;
 }) {
-  const { pending } = useFormStatus();
+  const status = useFormStatus();
+  const formPending = useContext(FormPending);
+  const pending = status.pending || formPending;
   return (
     <button
       type="submit"

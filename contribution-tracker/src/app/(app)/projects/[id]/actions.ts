@@ -3,7 +3,7 @@
 import { runAction, type ActionState } from "@/lib/actions";
 import { bool, money, optInt, str } from "@/lib/form";
 import { DomainError } from "@/server/errors";
-import { updateProjectDetails } from "@/server/projects";
+import { updateClient, updateProjectDetails } from "@/server/projects";
 
 const isoDate = (v: string, label: string) => {
   if (v && !/^\d{4}-\d{2}-\d{2}$/.test(v)) throw new DomainError("invalid", `${label} must be a date`);
@@ -35,4 +35,20 @@ export async function updateDetailsAction(projectId: number, canChangeOrigin: bo
       paymentSchedule: schedule,
     });
   }, "Project details saved");
+}
+
+export async function updateClientAction(clientId: number, _p: ActionState, fd: FormData) {
+  return runAction(
+    (ctx) =>
+      updateClient(ctx, clientId, {
+        businessName: str(fd, "business_name"),
+        stateCode: str(fd, "state_code"),
+        gstin: str(fd, "gstin"),
+        contactName: str(fd, "contact_name"),
+        contactEmail: str(fd, "contact_email"),
+        contactPhone: str(fd, "contact_phone"),
+        address: str(fd, "address"),
+      }),
+    "Client details saved",
+  );
 }

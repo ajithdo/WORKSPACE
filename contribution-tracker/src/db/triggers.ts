@@ -36,6 +36,9 @@ export function triggerStatements(): string[] {
   const s: string[] = [
     `CREATE TRIGGER IF NOT EXISTS audit_log_no_update BEFORE UPDATE ON audit_log ${abort("audit_log is append-only")}`,
     `CREATE TRIGGER IF NOT EXISTS audit_log_no_delete BEFORE DELETE ON audit_log ${abort("audit_log is append-only")}`,
+    // An issued GST invoice keeps its number, date, amounts and parties forever; only its payment status moves.
+    `CREATE TRIGGER IF NOT EXISTS invoice_issued_frozen BEFORE UPDATE ON invoices WHEN OLD.number IS NOT NULL AND (NEW.number IS NOT OLD.number OR NEW.issue_date IS NOT OLD.issue_date OR NEW.amount_ex_gst IS NOT OLD.amount_ex_gst OR NEW.cgst IS NOT OLD.cgst OR NEW.sgst IS NOT OLD.sgst OR NEW.igst IS NOT OLD.igst OR NEW.total IS NOT OLD.total OR NEW.parties IS NOT OLD.parties) ${abort("an issued invoice cannot be changed; cancel it and issue a new one")}`,
+    `CREATE TRIGGER IF NOT EXISTS invoice_issued_no_delete BEFORE DELETE ON invoices WHEN OLD.number IS NOT NULL ${abort("an issued invoice cannot be deleted")}`,
     `CREATE TRIGGER IF NOT EXISTS task_locked_no_update BEFORE UPDATE ON task_instances WHEN OLD.status = 'locked' ${abort("a locked task cannot be changed")}`,
     `CREATE TRIGGER IF NOT EXISTS task_delete_only_draft BEFORE DELETE ON task_instances WHEN OLD.status <> 'planned' OR (SELECT plan_status FROM projects WHERE id = OLD.project_id) = 'locked' ${abort("tasks can only be removed from a draft plan")}`,
     `CREATE TRIGGER IF NOT EXISTS snapshot_locked_no_update BEFORE UPDATE ON contribution_snapshots WHEN OLD.status = 'locked' ${abort("a locked snapshot cannot be changed")}`,

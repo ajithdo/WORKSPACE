@@ -92,6 +92,11 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 
     The invoice page now uses the project's place of supply, the same one the GST maths uses.
 
+23. **Client details and frozen invoices.** Client name, billing address, state, GSTIN and contacts can be edited from the project overview. GSTINs are checked for format and must match the client's state.
+    - When an invoice is issued, it stores a copy of the seller's and buyer's details, so editing them later never changes an issued invoice.
+    - A database trigger refuses any change to an issued invoice's number, date, amounts or parties, and refuses to delete it. Only its payment status moves; corrections are a cancellation plus a new invoice.
+24. **Forms keep their input on errors.** React 19 clears a form after every submit. The app's forms keep what was typed when the server rejects it, and early clicks before the page is interactive still work.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens

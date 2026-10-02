@@ -444,6 +444,19 @@ export const changeRequests = sqliteTable(
   (t) => [uniqueIndex("change_requests_project_number").on(t.projectId, t.number)],
 );
 
+export interface InvoiceParty {
+  name: string;
+  address: string;
+  gstin: string;
+  stateCode: string;
+}
+
+export interface InvoiceParties {
+  supplier: InvoiceParty & { udyamNumber: string; gstRegistered: boolean; msmeRegistered: boolean };
+  recipient: InvoiceParty & { contactName: string };
+  placeOfSupply: string;
+}
+
 export const invoices = sqliteTable(
   "invoices",
   {
@@ -475,6 +488,8 @@ export const invoices = sqliteTable(
     writtenOffReason: text("written_off_reason"),
     cancelledReason: text("cancelled_reason"),
     sentAt: text("sent_at"),
+    /** Seller and buyer details as they were when the invoice was issued; a GST invoice never changes afterwards. */
+    parties: text("parties", { mode: "json" }).$type<InvoiceParties>(),
     createdBy: integer("created_by").references(() => members.id),
     createdAt: createdAt(),
     updatedAt: text("updated_at").notNull(),
