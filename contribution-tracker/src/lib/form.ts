@@ -62,3 +62,15 @@ export function lines(fd: FormData, k: string): string[] {
     .map((l) => l.trim())
     .filter(Boolean);
 }
+
+/** The studio works in India: datetime-local inputs are IST (UTC+05:30, no daylight saving). */
+export function istLocalToIso(local: string): string {
+  const m = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(:\d{2})?$/.exec(local.trim());
+  if (!m) throw new DomainError("invalid", "Enter a date and time");
+  return new Date(`${m[1]}${m[2] ?? ":00"}+05:30`).toISOString();
+}
+
+/** Current time as a datetime-local value in IST, for form defaults. */
+export function istNowLocal(now = new Date()): string {
+  return new Date(now.getTime() + 330 * 60_000).toISOString().slice(0, 16);
+}

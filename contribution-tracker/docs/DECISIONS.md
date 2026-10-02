@@ -102,6 +102,8 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 26. **TDS certificate follow-up.** If a payment had TDS deducted and no Form 16A is recorded 60 days later, the inbox asks the partners to chase the client. Without the certificate the studio cannot claim the credit.
     - Certificates often arrive after a project closes. Recording one (pending → received, plus the certificate file) is therefore the single change the database allows on a closed project's payment. Every other column stays frozen by trigger.
 
+27. **Times are India time.** Meeting times typed into the app are read as IST (UTC+05:30, no daylight saving) and shown in IST, whatever timezone the server runs in. Docker containers run in UTC, which used to shift times by 5½ hours. The "when did it happen" field defaults to now.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens

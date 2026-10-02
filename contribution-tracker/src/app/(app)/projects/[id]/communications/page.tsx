@@ -7,6 +7,7 @@ import { communicationAwards, communicationQualifies } from "@/domain/communicat
 import { getDb } from "@/db";
 import { actionItems, communications, evidence, taskInstances } from "@/db/schema";
 import { requireMember } from "@/lib/session";
+import { istNowLocal } from "@/lib/form";
 import { canVerifyCommunication } from "@/server/communications";
 import { projectHeader } from "@/server/queries";
 import {
@@ -56,7 +57,7 @@ export default async function CommunicationsPage({ params }: { params: Promise<{
         </>
       ) : null}
       <Field label="When">
-        <input className="field-input" type="datetime-local" name="occurred_at" required />
+        <input className="field-input" type="datetime-local" name="occurred_at" defaultValue={istNowLocal()} required />
       </Field>
       <Field label="Channel">
         <select className="field-input" name="channel" defaultValue={planned?.channel ?? "video"}>

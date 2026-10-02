@@ -1,11 +1,11 @@
 "use server";
 
 import { runAction, type ActionState } from "@/lib/actions";
-import { bool, int, lines, optInt, optStr, str } from "@/lib/form";
+import { bool, int, istLocalToIso, lines, optInt, optStr, str } from "@/lib/form";
 import { cancelCommunication, logCommunication, planCommunication, rejectCommunication, verifyCommunication } from "@/server/communications";
 import { addEvidenceFor } from "@/lib/evidence-action";
 
-const toIso = (local: string) => (local ? new Date(local).toISOString() : new Date().toISOString());
+const toIso = (local: string) => (local ? istLocalToIso(local) : new Date().toISOString());
 
 export async function planCommunicationAction(projectId: number, _p: ActionState, fd: FormData) {
   return runAction(
