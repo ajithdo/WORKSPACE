@@ -112,3 +112,21 @@ describe("closure", () => {
     expect(reverifySnapshot(f.db, snap.snapshotId)).toMatchObject({ ok: true });
   });
 });
+
+describe("year summary", () => {
+  it("adds up each partner's locked payouts and the studio's money for the financial year", async () => {
+    const { yearSummary } = await import("@/server/yearSummary");
+    const f = workedExample();
+    closeAndLock(f);
+    const y = yearSummary(f.db, "26-27");
+    const a = y.partners.find((p) => p.memberId === f.a)!;
+    const b = y.partners.find((p) => p.memberId === f.b)!;
+    expect(a.total).toBe(2_783_500);
+    expect(b.total).toBe(2_676_500);
+    expect(b.reimbursement).toBe(600_000);
+    expect(a.due + b.due).toBe(2_783_500 + 2_676_500);
+    expect(a.projects).toBe(1);
+    expect(y.studio).toMatchObject({ invoicedExGst: 6_000_000, cashReceived: 7_080_000, revenueExGst: 6_000_000, expenses: 600_000, reserveIn: 540_000 });
+    expect(yearSummary(f.db, "25-26").partners.every((p) => p.total === 0)).toBe(true);
+  });
+});

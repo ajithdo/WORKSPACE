@@ -71,8 +71,12 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
     - A daily cap on Claude requests (`AI_DAILY_LIMIT`).
     - A server-side password reset (`npm run reset-password`), because the app sends no email. The member must replace the one-time password after signing in.
 
+20. **Year at a glance.** One financial year across all projects:
+    - Each partner's payouts from locked snapshots (reimbursed, base, pool, paid, still to pay).
+    - The studio's invoicing, cash, GST, TDS, expenses and reserve movement.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens
 
-`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/invoice/[invoiceId]` · `…/assistant` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.
+`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/invoice/[invoiceId]` · `…/assistant` · `/summary` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.
