@@ -174,7 +174,7 @@ export default async function AssistantPage({ params }: { params: Promise<{ id: 
           ))}
         </ul>
         <details>
-          <summary className="cursor-pointer font-semibold text-royal">Full brief and {report.sources.length} sources</summary>
+          <summary className="cursor-pointer font-semibold text-royal">Full brief and {report.sources.length} source{report.sources.length === 1 ? "" : "s"}</summary>
           <div className="mt-2 whitespace-pre-wrap text-sm">{report.brief}</div>
           <ul className="mt-2 list-disc pl-5 text-sm">
             {report.sources.filter((s) => isWebLink(s.url)).map((s) => (

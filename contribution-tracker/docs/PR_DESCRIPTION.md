@@ -80,7 +80,7 @@ Interpretations of gaps in the spec, and every added feature, are listed in `con
   - the browser flow against the dev server and against the production build;
   - a Docker job that builds the image, starts it on a fresh root-owned bind mount, checks `/health` and runs the browser flow against the container.
 - Every page has been checked at phone width and for unlabeled form fields.
-- Not run: live Claude calls, because there is no API key in CI. They are covered with a fake client.
+- Claude features were exercised end to end in the production build against a local stand-in for the Anthropic API. The completion check and the web-search research both ran, with the right model, fallback and structured-output betas, and the reports rendered. They have not been run against the real API (no key here).
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
