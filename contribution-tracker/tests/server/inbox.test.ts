@@ -32,3 +32,18 @@ describe("studio setup reminder", () => {
     expect(inboxFor(f.db, f.a, T0).some((i) => i.kind === "setup_studio")).toBe(false);
   });
 });
+
+describe("TDS certificate follow-up", () => {
+  it("appears 60 days after a payment with TDS until the certificate is recorded", async () => {
+    const { createInvoice, issueInvoice, recordPayment, recordTdsCertificate } = await import("@/server/finance");
+    const f = bootstrap();
+    const { invoiceId } = createInvoice(f.at(f.a), f.projectId, { type: "advance", issueDate: "2026-10-01", dueDate: "2026-10-08", amountExGst: 3_000_000, tdsExpectedRateBp: 1000 });
+    issueInvoice(f.at(f.a), invoiceId);
+    const { paymentId } = recordPayment(f.at(f.a), invoiceId, { receivedDate: "2026-10-01", amountReceived: 3_240_000, tdsDeducted: 300_000, bankReference: "UTR42", mode: "bank" });
+    const tds = (d: string) => inboxFor(f.db, f.a, new Date(d)).filter((i) => i.kind === "tds_certificate");
+    expect(tds("2026-11-15T00:00:00Z")).toHaveLength(0);
+    expect(tds("2026-12-01T00:00:00Z")).toHaveLength(1);
+    recordTdsCertificate(f.at(f.a), paymentId, {});
+    expect(tds("2026-12-01T00:00:00Z")).toHaveLength(0);
+  });
+});

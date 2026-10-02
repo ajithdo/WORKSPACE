@@ -17,7 +17,10 @@ import {
   reserveLedger,
   taskInstances,
 } from "@/db/schema";
+import { formatINR } from "@/domain/money";
 import { hasVoted } from "./approvals";
+
+const TDS_CHASE_DAYS = 60;
 import { canVerifyCommunication } from "./communications";
 import { ACTIVE_DISPUTE } from "./contribution";
 import { disputeParties } from "./disputes";
@@ -38,7 +41,8 @@ export type InboxKind =
   | "approve_reserve"
   | "overdue_invoice"
   | "approve_version"
-  | "setup_studio";
+  | "setup_studio"
+  | "tds_certificate";
 
 export interface InboxItem {
   kind: InboxKind;
@@ -93,6 +97,13 @@ export function inboxFor(db: AppDb, memberId: number, now: Date): InboxItem[] {
     }
     for (const pay of db.select().from(payments).where(and(inArray(payments.projectId, ids), isNull(payments.verifiedBy))).all()) {
       if (pay.recordedBy !== memberId) push({ kind: "verify_payment", projectId: pay.projectId, title: "Check a payment against the bank statement", detail: `Ref ${pay.bankReference}`, href: `/projects/${pay.projectId}/finance`, at: pay.recordedAt });
+    }
+    // Form 16A arrives quarterly; chase it once two months have passed, or the TDS credit is lost.
+    const chaseBefore = new Date(now.getTime() - TDS_CHASE_DAYS * 86_400_000).toISOString().slice(0, 10);
+    for (const pay of db.select().from(payments).where(and(inArray(payments.projectId, ids), eq(payments.tdsCertificateStatus, "pending"))).all()) {
+      if (pay.tdsDeducted > 0 && pay.receivedDate <= chaseBefore) {
+        push({ kind: "tds_certificate", projectId: pay.projectId, title: "Ask the client for the TDS certificate (Form 16A)", detail: `${formatINR(pay.tdsDeducted)} deducted from the payment of ${pay.receivedDate} (ref ${pay.bankReference})`, href: `/projects/${pay.projectId}/finance`, at: pay.receivedDate });
+      }
     }
     const today = now.toISOString().slice(0, 10);
     for (const inv of db.select().from(invoices).where(inArray(invoices.projectId, ids)).all()) {

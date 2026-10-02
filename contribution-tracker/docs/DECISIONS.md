@@ -99,6 +99,8 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 
 25. **How it works.** An in-app guide to the rules in plain words: planning, evidence, how points become money, disputes and closing. The numbers (reserve, caps, windows) are read from the active rules version, so the guide never goes out of date.
 
+26. **TDS certificate follow-up.** If a payment had TDS deducted and no Form 16A is recorded 60 days later, the inbox asks the partners to chase the client. Without the certificate the studio cannot claim the credit.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens
