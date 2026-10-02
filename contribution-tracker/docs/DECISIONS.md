@@ -97,8 +97,10 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
     - A database trigger refuses any change to an issued invoice's number, date, amounts or parties, and refuses to delete it. Only its payment status moves; corrections are a cancellation plus a new invoice.
 24. **Forms keep their input on errors.** React 19 clears a form after every submit. The app's forms keep what was typed when the server rejects it, and early clicks before the page is interactive still work.
 
+25. **How it works.** An in-app guide to the rules in plain words: planning, evidence, how points become money, disputes and closing. The numbers (reserve, caps, windows) are read from the active rules version, so the guide never goes out of date.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens
 
-`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/report` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/invoice/[invoiceId]` · `…/quote` · `…/assistant` · `/summary` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.
+`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/report` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/invoice/[invoiceId]` · `…/quote` · `…/assistant` · `/summary` · `/guide` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.

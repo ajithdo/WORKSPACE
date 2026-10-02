@@ -17,6 +17,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     { href: "/library", label: "Task library" },
     { href: "/settings", label: "Studio and rules" },
     { href: "/audit", label: "Audit log" },
+    { href: "/guide", label: "How it works" },
   ];
   return (
     <div className="md:grid md:min-h-dvh md:grid-cols-[15rem_1fr] print:block">
