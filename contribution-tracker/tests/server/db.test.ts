@@ -92,3 +92,27 @@ describe("audit chain", () => {
     expect(verifyAuditChain(db)).toMatchObject({ ok: false, firstBrokenId: 3, reason: "entry content does not match its hash" });
   });
 });
+
+describe("upgrade safety", () => {
+  it("copies an existing database before applying new migrations, and leaves new ones alone", async () => {
+    const fs = await import("node:fs");
+    const os = await import("node:os");
+    const path = await import("node:path");
+    const Database = (await import("better-sqlite3")).default;
+    const { openDb, snapshotBeforeUpgrade } = await import("@/db");
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "ct-upgrade-"));
+    const file = path.join(dir, "app.db");
+    const db = openDb(file);
+    expect(snapshotBeforeUpgrade(db.$client, file)).toBeNull(); // up to date
+    // Pretend the last update has not been applied yet.
+    db.$client.exec("DELETE FROM __drizzle_migrations WHERE created_at = (SELECT max(created_at) FROM __drizzle_migrations)");
+    const copy = snapshotBeforeUpgrade(db.$client, file);
+    expect(copy).toMatch(/backups[\\/]pre-upgrade-.*\.db$/);
+    const restored = new Database(copy!);
+    expect(restored.prepare("SELECT count(*) AS n FROM sqlite_master WHERE name = 'audit_log'").get()).toEqual({ n: 1 });
+    restored.close();
+    const fresh = new Database(path.join(dir, "new.db"));
+    expect(snapshotBeforeUpgrade(fresh, path.join(dir, "new.db"))).toBeNull();
+    fresh.close();
+  });
+});

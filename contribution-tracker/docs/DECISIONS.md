@@ -135,6 +135,8 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
     - The standalone output excludes the data folder and the sources.
     - `npm start` runs the same standalone server the Docker image uses.
 
+35. **Safe upgrades.** When an updated app starts on an existing database with pending migrations, it first writes a consistent copy (`VACUUM INTO`) to `DATA_DIR/backups/pre-upgrade-<time>.db`. A bad upgrade can always be rolled back by restoring that file.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens
