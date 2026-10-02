@@ -10,6 +10,20 @@ A self-hosted web app for a two-partner web studio. It does five things:
 
 It implements `docs/spec/contribution-app-spec.md`. Every place the spec was silent or ambiguous, and every feature added beyond it, is listed in [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
+## A quick tour
+
+| Where | What you do there |
+|---|---|
+| **Needs your action** | Everything waiting on you: work to verify, approvals, payments to check against the bank, overdue invoices, missing Form 16A certificates. |
+| Project → **Plan / Board / task pages** | Lock the plan together. Then start each task, add evidence and submit it; your partner verifies. |
+| Project → **Client update** | A weekly progress report to print, or to send by WhatsApp or email. |
+| Project → **Finance** | Invoices (print as a GST tax invoice), payments, expenses, the quotation, and ready-made payment reminders for overdue invoices. |
+| Project → **Preview / AI assistant** | See the site you're building, run the free site check, and let Claude suggest finished tasks or research the niche. |
+| Project → **Contribution / Closure** | The live split, then the locked, hash-checked final split and the printable statement. |
+| **Year at a glance** | Each partner's payouts and the studio's money for a financial year. |
+| **Studio and rules** | Studio details for invoices, partners, the money rules (changed only with both partners' approval), the reserve, CSV exports for your CA, and backups. |
+| **How it works** | The rules in plain words, with your current numbers. |
+
 ## Run it on your own server (Docker)
 
 ```bash
