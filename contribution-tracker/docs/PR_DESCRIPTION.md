@@ -31,7 +31,13 @@ Interpretations of gaps in the spec, and every added feature, are listed in `con
 
 **Clients**
 - A weekly client update (printable, or as WhatsApp/email text) with internal work left out.
-- Editable client and project details, with GSTIN checks.
+- Editable client and project details. GSTINs are validated for format, the check character and the state.
+
+**Daily use**
+- "My work": each partner's own tasks, grouped by what to do next.
+- Search: projects, clients, invoice numbers, UTRs and tasks.
+- "How it works": the rules in plain words, with your live numbers.
+- Reminders to collect Form 16A, which can still be recorded after a project closes.
 
 **Building sites**
 - **Preview tab:** view the site being built (localhost, staging or live) at phone, tablet or desktop size.
@@ -41,16 +47,27 @@ Interpretations of gaps in the spec, and every added feature, are listed in `con
   - niche research with web search.
 
   Suggestions never verify; the other partner always does. Claude requests are capped per day.
+- **GitHub webhook:** commits that name a task code ("AI-05: add sitemap") become strong evidence for the matching partner. The webhook is signed, secret-scanned and idempotent.
 
 **Running it yourself**
-- Docker image with a healthcheck.
+- Docker image with a healthcheck. The data-folder ownership is fixed at start-up, then the app drops root.
+- `npm start` runs the same standalone server.
 - Automatic daily database copies and a consistent backup command.
 - Audit-chain verification.
-- Server-side password reset (the app sends no email).
+- Server-side password reset (the app sends no email), and signing out other devices.
+- Dates and times follow IST whatever the server timezone.
+
+## Bugs found and fixed while hardening
+
+- **Production builds pre-rendered the sign-in pages as "redirect to setup"** (better-sqlite3 is synchronous), so nobody could sign in on a real deployment. Every page now waits for the request, and CI runs the browser flow against the production build and the Docker container.
+- React 19 cleared forms when the server rejected them. Input is now kept.
+- Meeting times were read in the server's timezone (UTC in Docker), and "today" used the UTC date, which put 1 AM IST on 1 April invoices in the previous financial year.
+- Docker could not write a bind-mounted data folder created by root.
+- Issued invoices reprinted with later-edited client details. They now store their parties, and a trigger freezes them.
 
 ## Testing
 
-- `npm test`: 181 unit and service tests pass.
+- `npm test`: 195 unit and service tests pass.
 - `npm run test:e2e` (Playwright) covers:
   1. setup;
   2. creating a project;
@@ -58,13 +75,12 @@ Interpretations of gaps in the spec, and every added feature, are listed in `con
   4. a task done with evidence and verified by the other partner;
   5. a rejected form keeps its input;
   6. the client update, year summary, preview and assistant pages.
-- Also passing or checked:
-  - `npm run build`.
-  - The GitHub Actions workflow runs all of the above on every push.
-  - Every page has been checked at phone width.
-- Not run here:
-  - `docker build`, because there is no Docker daemon in the sandbox. The standalone server was run the same way the image runs it.
-  - Live Claude calls, because there is no API key. These are covered with a fake client.
+- GitHub Actions runs on every push:
+  - typecheck, unit tests and the build;
+  - the browser flow against the dev server and against the production build;
+  - a Docker job that builds the image, starts it on a fresh root-owned bind mount, checks `/health` and runs the browser flow against the container.
+- Every page has been checked at phone width and for unlabeled form fields.
+- Not run: live Claude calls, because there is no API key in CI. They are covered with a fake client.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
