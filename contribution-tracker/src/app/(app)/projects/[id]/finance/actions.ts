@@ -14,6 +14,7 @@ import {
   requestReserveRelease,
   verifyPayment,
   writeOffInvoice,
+  duplicateInvoice,
 } from "@/server/finance";
 import { storeFile } from "@/server/files";
 
@@ -95,4 +96,7 @@ export async function rejectExpenseAction(id: number, _p: ActionState, fd: FormD
 }
 export async function reserveReleaseAction(projectId: number, _p: ActionState, fd: FormData) {
   return runAction((ctx) => requestReserveRelease(ctx, { projectId, amount: money(fd, "amount", "Amount"), purpose: str(fd, "purpose") }), "Requested. Your partner approves it on the Studio page.");
+}
+export async function duplicateInvoiceAction(id: number, _p: ActionState, _fd: FormData) {
+  return runAction((ctx) => duplicateInvoice(ctx, id), "New draft created; check it and issue it");
 }

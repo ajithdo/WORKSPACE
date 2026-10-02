@@ -107,3 +107,15 @@ describe("issued invoices are frozen", () => {
     expect(() => updateClient(f.at(f.a), clientId, { ...base, gstin: "", contactEmail: "not-an-email" })).toThrow(/valid email/);
   });
 });
+
+describe("copy an invoice", () => {
+  it("starts a new draft dated today with the same amount and payment terms", async () => {
+    const { duplicateInvoice } = await import("@/server/finance");
+    const f = bootstrap();
+    const { invoiceId } = createInvoice(f.at(f.a), f.projectId, { type: "milestone", issueDate: "2026-09-01", dueDate: "2026-09-16", amountExGst: 1_200_000, tdsExpectedRateBp: 200, notes: "Monthly care plan" });
+    issueInvoice(f.at(f.a), invoiceId);
+    const { invoiceId: copy } = duplicateInvoice(f.at(f.a, new Date("2026-10-01T06:00:00Z")), invoiceId);
+    const inv = f.db.select().from(invoices).where(eq(invoices.id, copy)).get()!;
+    expect(inv).toMatchObject({ status: "draft", number: null, issueDate: "2026-10-01", dueDate: "2026-10-16", amountExGst: 1_200_000, tdsExpectedRateBp: 200, notes: "Monthly care plan" });
+  });
+});

@@ -1,6 +1,6 @@
 import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { findSecrets, SECRET_KIND_LABELS } from "@/domain/secrets";
-import { financialYearLabel, formatInvoiceNumber, msmeDueDate, paymentRevenue, splitGst } from "@/domain/money";
+import { addDaysIso, financialYearLabel, formatInvoiceNumber, msmeDueDate, paymentRevenue, splitGst } from "@/domain/money";
 import type { AppDb, DbOrTx } from "@/db";
 import { clients, expenses, invoices, payments, reserveLedger, studio, type InvoiceParties } from "@/db/schema";
 import type { Ctx } from "./context";
@@ -415,4 +415,23 @@ export function paidInvoicesExist(db: DbOrTx, projectId: number): boolean {
     .from(payments)
     .where(and(eq(payments.projectId, projectId), isNotNull(payments.verifiedBy)))
     .get();
+}
+
+/**
+ * Starts a new draft from an existing invoice (recurring AMC or a repeat milestone): same type,
+ * amount, TDS rate and notes, issued today with the same number of days to pay.
+ */
+export function duplicateInvoice(ctx: Ctx, invoiceId: number): { invoiceId: number } {
+  const src = loadInvoice(ctx.db, invoiceId);
+  const today = isoDate(ctx.now);
+  const days = Math.max(0, Math.round((Date.parse(src.dueDate) - Date.parse(src.issueDate)) / 86_400_000));
+  return createInvoice(ctx, src.projectId, {
+    type: src.type,
+    issueDate: today,
+    dueDate: addDaysIso(today, days),
+    amountExGst: src.amountExGst,
+    tdsExpectedRateBp: src.tdsExpectedRateBp,
+    milestoneCode: src.milestoneCode,
+    notes: src.notes,
+  });
 }

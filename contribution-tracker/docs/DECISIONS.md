@@ -107,6 +107,9 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 
 28. **Search.** A search box in the sidebar finds projects, clients (name, GSTIN, contact), invoice numbers, payment references (UTR) and tasks, limited to projects you are on. LIKE wildcards are matched literally.
 
+29. **Copy an invoice.** For recurring AMC or care-plan billing, any issued invoice can be copied into a new draft. The draft keeps the type, amount, TDS rate and notes, is dated today, and keeps the same number of days to pay. It gets a number only when issued.
+30. **Sign out other devices.** Changing your password signs out every other session. A button in Settings does the same on demand, for a lost phone or a shared computer.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens
