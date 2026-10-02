@@ -54,6 +54,19 @@ DATA_DIR=./demo-data npm run dev
 
 Sign in as `asha@studio.test` / `demo password one`, or as `bala@studio.test` / `demo password two`.
 
+## Your first day
+
+1. **Start it** (Docker or Node, above) and open it. The setup wizard asks for the studio name, state, GST/MSME status, and both partners' names, emails and passwords.
+2. **Studio and rules → Studio details:** add the legal name, address, GSTIN and Udyam number. They print on every invoice and quotation, and the inbox reminds you until they are filled in.
+3. **Read How it works** together. If a number (reserve %, caps, dispute window) doesn't match your partnership deed, change it under **Studio and rules → Rules**. Both partners must approve the change.
+4. **Projects → New project:** choose the kind of site. The plan is pre-filled from the task library. Adjust owners, then **Send to partner to lock**; your partner approves.
+5. **Finance → Quotation** gives the client a printable quote. When the contract is signed, raise the advance invoice, then record the payment when it arrives. Your partner ticks "Matches bank".
+6. **Do the work:** pick tasks from **My work**, add evidence, submit. Your partner verifies from **Needs your action**.
+7. Optional:
+   - add `ANTHROPIC_API_KEY` for the AI assistant;
+   - add `GITHUB_WEBHOOK_SECRET` so commits become evidence;
+   - set up an off-server copy of the `data` folder (see below).
+
 ## Backups and integrity
 
 | What | How |
