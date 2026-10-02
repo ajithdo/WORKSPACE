@@ -110,6 +110,8 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 29. **Copy an invoice.** For recurring AMC or care-plan billing, any issued invoice can be copied into a new draft. The draft keeps the type, amount, TDS rate and notes, is dated today, and keeps the same number of days to pay. It gets a number only when issued.
 30. **Sign out other devices.** Changing your password signs out every other session. A button in Settings does the same on demand, for a lost phone or a shared computer.
 
+31. **GSTIN check character.** Every GSTIN entered (studio or client) is checked for format, its mod-36 check character and its state code. A typo on an invoice would cost the client their input tax credit, so it is caught before it is saved.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens

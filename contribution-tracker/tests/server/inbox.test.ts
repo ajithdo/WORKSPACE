@@ -28,7 +28,7 @@ describe("studio setup reminder", () => {
     const f = bootstrap();
     const item = inboxFor(f.db, f.a, T0).find((i) => i.kind === "setup_studio");
     expect(item?.detail).toMatch(/legal name, address, GSTIN, Udyam number/);
-    updateStudio(f.at(f.a), { legalName: "Two Partner Studio LLP", address: "Hyderabad", gstin: "36ABCDE1234F1Z5", udyamNumber: "UDYAM-TS-00-0000001" });
+    updateStudio(f.at(f.a), { legalName: "Two Partner Studio LLP", address: "Hyderabad", gstin: "36ABCDE1234F1Z1", udyamNumber: "UDYAM-TS-00-0000001" });
     expect(inboxFor(f.db, f.a, T0).some((i) => i.kind === "setup_studio")).toBe(false);
   });
 });

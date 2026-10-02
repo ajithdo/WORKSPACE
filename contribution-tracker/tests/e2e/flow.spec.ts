@@ -84,11 +84,11 @@ test("setup → create project → both partners lock the plan → task done and
   await page.goto(projectPath);
   await page.getByText("Edit client details").click();
   await page.fill('textarea[name="address"]', "12 Bakery Lane, Hyderabad");
-  await page.fill('input[name="gstin"]', "29AAACS1234A1Z5");
+  await page.fill('input[name="gstin"]', "29AAACS1234A1ZY");
   await page.getByRole("button", { name: "Save client" }).click();
-  await expect(page.getByText(/match the client's state/)).toBeVisible();
+  await expect(page.getByText(/match the state/)).toBeVisible();
   await expect(page.locator('textarea[name="address"]')).toHaveValue("12 Bakery Lane, Hyderabad");
-  await page.fill('input[name="gstin"]', "36AAACS1234A1Z5");
+  await page.fill('input[name="gstin"]', "36AAACS1234A1Z3");
   await page.getByRole("button", { name: "Save client" }).click();
   await expect(page.getByText("Client details saved")).toBeVisible();
 

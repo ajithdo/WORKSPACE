@@ -84,12 +84,12 @@ describe("issued invoices are frozen", () => {
     const { clients, invoices, projects } = await import("@/db/schema");
     const f = bootstrap();
     const clientId = f.db.select().from(projects).where(eq(projects.id, f.projectId)).get()!.clientId!;
-    updateClient(f.at(f.a), clientId, { businessName: "Sunrise Bakery", stateCode: "36", gstin: "36AAACS1234A1Z5", contactName: "Ravi", contactEmail: "ravi@example.com", contactPhone: "9876543210", address: "Road No. 1, Hyderabad" });
+    updateClient(f.at(f.a), clientId, { businessName: "Sunrise Bakery", stateCode: "36", gstin: "36AAACS1234A1Z3", contactName: "Ravi", contactEmail: "ravi@example.com", contactPhone: "9876543210", address: "Road No. 1, Hyderabad" });
     const { invoiceId } = createInvoice(f.at(f.a), f.projectId, { type: "advance", issueDate: "2026-10-01", dueDate: "2026-10-08", amountExGst: 3_000_000 });
     issueInvoice(f.at(f.a), invoiceId);
     updateClient(f.at(f.a), clientId, { businessName: "Sunrise Bakers Pvt Ltd", stateCode: "36", gstin: "", contactName: "Ravi", contactEmail: "", contactPhone: "", address: "New address" });
     const inv = f.db.select().from(invoices).where(eq(invoices.id, invoiceId)).get()!;
-    expect(inv.parties?.recipient).toMatchObject({ name: "Sunrise Bakery", gstin: "36AAACS1234A1Z5", address: "Road No. 1, Hyderabad" });
+    expect(inv.parties?.recipient).toMatchObject({ name: "Sunrise Bakery", gstin: "36AAACS1234A1Z3", address: "Road No. 1, Hyderabad" });
     expect(inv.parties?.placeOfSupply).toBe("36");
     expect(f.db.select().from(clients).where(eq(clients.id, clientId)).get()?.businessName).toBe("Sunrise Bakers Pvt Ltd");
     expect(() => f.db.update(invoices).set({ amountExGst: 1 }).where(eq(invoices.id, invoiceId)).run()).toThrow(/issued invoice cannot be changed/);
@@ -102,7 +102,7 @@ describe("issued invoices are frozen", () => {
     const f = bootstrap();
     const clientId = f.db.select().from(projects).where(eq(projects.id, f.projectId)).get()!.clientId!;
     const base = { businessName: "Sunrise Bakery", stateCode: "36", contactName: "", contactEmail: "", contactPhone: "", address: "" };
-    expect(() => updateClient(f.at(f.a), clientId, { ...base, gstin: "29AAACS1234A1Z5" })).toThrow(/match the client's state/);
+    expect(() => updateClient(f.at(f.a), clientId, { ...base, gstin: "29AAACS1234A1ZY" })).toThrow(/match the state/);
     expect(() => updateClient(f.at(f.a), clientId, { ...base, gstin: "123" })).toThrow(/15 characters/);
     expect(() => updateClient(f.at(f.a), clientId, { ...base, gstin: "", contactEmail: "not-an-email" })).toThrow(/valid email/);
   });

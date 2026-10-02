@@ -1,4 +1,5 @@
 import { and, desc, eq, like } from "drizzle-orm";
+import { gstinProblem } from "@/domain/gstin";
 import { suggestAssignments } from "@/domain/assignment";
 import type { StudioConfig } from "@/domain/config";
 import { selectTemplatesForType } from "@/domain/library";
@@ -60,7 +61,6 @@ export function activeVersionIds(tx: DbOrTx): { libraryVersionId: number; config
   return { libraryVersionId: lib.id, configVersionId: cfg.id };
 }
 
-const GSTIN = /^[0-9]{2}[A-Z0-9]{13}$/;
 
 function nextProjectCode(tx: DbOrTx, now: Date): string {
   const year = now.getUTCFullYear();
@@ -96,8 +96,8 @@ export function createProject(ctx: Ctx, input: CreateProjectInput): { projectId:
     if (input.kind === "client") {
       if (clientId == null && input.newClient) {
         const g = input.newClient.gstin?.trim().toUpperCase() ?? "";
-        if (g && !GSTIN.test(g)) throw new DomainError("invalid", "Client GSTIN must be 15 characters starting with the state code");
-        if (g && input.newClient.stateCode && g.slice(0, 2) !== input.newClient.stateCode) throw new DomainError("invalid", "The client GSTIN's first two digits must match the client's state");
+        const problem = g ? gstinProblem(g, input.newClient.stateCode) : null;
+        if (problem) throw new DomainError("invalid", `Client GSTIN: ${problem}`);
         clientId = tx
           .insert(clients)
           .values({
@@ -346,8 +346,8 @@ export function updateClient(
 ) {
   requireActor(ctx);
   const gstin = patch.gstin.trim().toUpperCase();
-  if (gstin && !GSTIN.test(gstin)) throw new DomainError("invalid", "GSTIN must be 15 characters starting with the state code");
-  if (gstin && patch.stateCode && gstin.slice(0, 2) !== patch.stateCode) throw new DomainError("invalid", "The GSTIN's first two digits must match the client's state");
+  const problem = gstin ? gstinProblem(gstin, patch.stateCode) : null;
+  if (problem) throw new DomainError("invalid", problem);
   const email = patch.contactEmail.trim();
   if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new DomainError("invalid", "Enter a valid email address");
   ctx.db.transaction((tx) => {
