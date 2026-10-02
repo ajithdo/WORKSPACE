@@ -128,4 +128,11 @@
   - An exported helper in a server-action file.
   - A missing membership check on project edits.
   - Low-contrast faint text.
+- [x] Hardening on day 2 (afternoon):
+  - Production builds pre-rendered sign-in pages as redirects to setup. Fixed; CI now runs the browser flow against the production build and the Docker container.
+  - `npm start` runs the standalone server; GitHub commits become evidence through a signed webhook.
+  - My work, search, and an automatic database copy before upgrades.
+  - Browser QA of payments, communications, change requests, disputes, closure (₹27,835 / ₹26,765), rules change and post-lock correction.
+  - AI flows exercised in the production build against a stand-in Anthropic API.
+  - 197 unit and service tests pass; all CI jobs green.
 - [ ] Not verified here: live Claude calls (no API key in the sandbox; covered by tests with a fake client). Set `ANTHROPIC_API_KEY` on the server to use them.

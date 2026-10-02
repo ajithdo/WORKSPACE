@@ -67,7 +67,7 @@ Interpretations of gaps in the spec, and every added feature, are listed in `con
 
 ## Testing
 
-- `npm test`: 195 unit and service tests pass.
+- `npm test`: 197 unit and service tests pass.
 - `npm run test:e2e` (Playwright) covers:
   1. setup;
   2. creating a project;
