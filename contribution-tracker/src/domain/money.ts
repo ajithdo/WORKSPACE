@@ -119,3 +119,24 @@ export function amountInWordsINR(paise: number): string {
   const p = Math.abs(paise) % 100;
   return `${paise < 0 ? "Minus " : ""}Rupees ${indianWords(rupees)}${p ? ` and ${below1000(p)} Paise` : ""} Only`;
 }
+
+/**
+ * Splits a total across weighted lines in whole rupees (largest remainder, ties to the earlier line),
+ * so the lines always add up exactly to the total.
+ */
+export function allocateByWeight(totalPaise: number, weights: number[]): number[] {
+  const rupees = Math.round(totalPaise / 100);
+  const sum = weights.reduce((s, w) => s + Math.max(0, w), 0);
+  if (!weights.length) return [];
+  if (sum <= 0) return weights.map((_, i) => (i === 0 ? rupees * 100 : 0));
+  const exact = weights.map((w) => (rupees * Math.max(0, w)) / sum);
+  const floor = exact.map(Math.floor);
+  let left = rupees - floor.reduce((s, v) => s + v, 0);
+  const order = exact.map((v, i) => ({ i, frac: v - Math.floor(v) })).sort((a, b) => b.frac - a.frac || a.i - b.i);
+  for (const { i } of order) {
+    if (left <= 0) break;
+    floor[i]! += 1;
+    left -= 1;
+  }
+  return floor.map((r) => r * 100);
+}

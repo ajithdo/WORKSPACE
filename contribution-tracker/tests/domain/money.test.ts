@@ -111,3 +111,15 @@ describe("amountInWordsINR", () => {
     expect(amountInWordsINR(100)).toBe("Rupees One Only");
   });
 });
+
+describe("allocateByWeight", () => {
+  it("splits in whole rupees and always adds up", async () => {
+    const { allocateByWeight } = await import("@/domain/money");
+    expect(allocateByWeight(6_000_000, [1, 1, 1])).toEqual([2_000_000, 2_000_000, 2_000_000]);
+    const odd = allocateByWeight(1_000_000, [1, 1, 1]);
+    expect(odd.reduce((s, v) => s + v, 0)).toBe(1_000_000);
+    expect(odd).toEqual([333_400, 333_300, 333_300]);
+    expect(allocateByWeight(500_000, [0, 0])).toEqual([500_000, 0]);
+    expect(allocateByWeight(500_000, [])).toEqual([]);
+  });
+});

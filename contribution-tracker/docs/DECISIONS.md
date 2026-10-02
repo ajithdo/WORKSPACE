@@ -83,8 +83,17 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 
     Sales, partner-admin and other internal tasks and milestones are never included.
 
+22. **Quotation (SOP G-04).** A printable quote built from the plan:
+    - Scope by phase, with the quoted price split across phases by planned points, in whole rupees that add up exactly.
+    - GST treatment from the place of supply.
+    - The payment schedule.
+    - A validity date (default 15 days).
+    - The quote number (`QUO/<project>/<date>`) is kept separate from the GST invoice series, as the SOP requires.
+
+    The invoice page now uses the project's place of supply, the same one the GST maths uses.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens
 
-`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/report` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/invoice/[invoiceId]` · `…/assistant` · `/summary` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.
+`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/report` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/invoice/[invoiceId]` · `…/quote` · `…/assistant` · `/summary` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.

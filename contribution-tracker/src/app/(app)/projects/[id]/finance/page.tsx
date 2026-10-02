@@ -84,7 +84,17 @@ export default async function FinancePage({ params }: { params: Promise<{ id: st
         </Note>
         <KeyValue
           items={[
-            ["Quoted before GST", <Money key="q" paise={p.quotedAmountExGst} />],
+            [
+              "Quoted before GST",
+              <span key="q">
+                <Money paise={p.quotedAmountExGst} />{" "}
+                {p.quotedAmountExGst ? (
+                  <Link href={`/projects/${projectId}/quote`} className="ml-1 text-sm font-semibold text-royal hover:underline">
+                    Quotation
+                  </Link>
+                ) : null}
+              </span>,
+            ],
             ["Invoiced with GST", <Money key="i" paise={fin.invoicedTotal} />],
             ["Cash received", <Money key="c" paise={fin.cashReceived} />],
             ["Revenue counted", <Money key="r" paise={fin.revenueExGstVerified} />],

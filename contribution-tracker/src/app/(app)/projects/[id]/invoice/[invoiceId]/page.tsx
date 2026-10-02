@@ -35,7 +35,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   const gst = !!studio?.gstRegistered;
   const draft = !inv.number;
   const rate = inv.gstRateBp / 100;
-  const supplyState = client?.stateCode ?? "";
+  const supplyState = p.placeOfSupplyState || client?.stateCode || "";
   const kind = INVOICE_KIND[inv.type] ?? inv.type.replace(/_/g, " ");
   const description = `${kind}: website design and development, ${p.name}${inv.milestoneCode ? ` (milestone ${inv.milestoneCode})` : ""}`;
   return (
