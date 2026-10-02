@@ -113,5 +113,19 @@
 - [x] Extra: site Preview tab, automated site check, Claude completion check, Claude niche research with web search
 - [x] Extra: printable GST tax invoice
 - [x] Task 7 Review (authorization, SSRF guard, print checks); fixes pushed
-- [ ] Open PR. Blocked: the repo has no base branch, because this branch became the default. A `main` branch must be created first. The PR text is ready in `contribution-tracker/docs/PR_DESCRIPTION.md`.
-- [ ] Not verified here: `docker build` (no Docker daemon in the sandbox; the same standalone layout was run directly and works) and live Claude calls (no API key in the sandbox; covered by tests with a fake client).
+- [x] PR opened: https://github.com/ajithdo/WORKSPACE/pull/1 (base `main` created at the first commit, with the user's approval)
+- [x] CI on GitHub Actions: typecheck, unit/service tests, build, Playwright e2e, and a Docker job that builds the image, starts it on a fresh bind mount and checks `/health`. All green.
+- [x] Extras on day 2:
+  - Billing and accounts: payment reminders (WhatsApp/email), accountant CSV exports, Year at a glance, quotation, copy invoice for AMC.
+  - Clients: client progress update, editable project and client details.
+  - Data integrity: frozen issued invoices (stored parties and a trigger), GSTIN check-character and Udyam validation, late Form 16A after closure, TDS inbox follow-up.
+  - Self-hosting: daily auto backups, health check, password reset, sign out other devices, daily AI cap.
+  - Usability: search, "How it works" guide, GitHub commits as evidence.
+- [x] Bugs found and fixed on day 2:
+  - React 19 wiped form input on server errors.
+  - Times were stored in UTC instead of IST, and "today" used the UTC date (wrong FY around midnight).
+  - Docker data folder ownership.
+  - An exported helper in a server-action file.
+  - A missing membership check on project edits.
+  - Low-contrast faint text.
+- [ ] Not verified here: live Claude calls (no API key in the sandbox; covered by tests with a fake client). Set `ANTHROPIC_API_KEY` on the server to use them.
