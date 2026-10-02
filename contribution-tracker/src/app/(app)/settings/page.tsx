@@ -244,7 +244,7 @@ export default async function SettingsPage() {
           </ActionForm>
         </details>
         <div className="mt-3">
-          <ActionButton action={signOutOthersAction} label="Sign out my other devices" variant="quiet" />
+          <ActionButton action={signOutOthersAction} label="Sign out my other devices" variant="quiet" showResult />
         </div>
         <details id="password" className="mt-3" open={me.mustChangePassword}>
           <summary className="cursor-pointer font-semibold text-royal">Change my password</summary>

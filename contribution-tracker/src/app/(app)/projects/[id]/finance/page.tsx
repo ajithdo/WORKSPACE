@@ -204,7 +204,7 @@ export default async function FinancePage({ params }: { params: Promise<{ id: st
                 {open ? (
                   <div className="mt-2 flex flex-wrap items-start gap-2">
                     {inv.status === "draft" ? <ActionButton action={issueInvoiceAction.bind(null, inv.id)} label="Issue (assign number)" /> : null}
-                    {inv.number ? <ActionButton action={duplicateInvoiceAction.bind(null, inv.id)} label="Copy as a new draft" variant="quiet" /> : null}
+                    {inv.number ? <ActionButton action={duplicateInvoiceAction.bind(null, inv.id)} label="Copy as a new draft" variant="quiet" showResult /> : null}
                     {["sent", "part_paid"].includes(inv.status) && !inv.writtenOffReason ? (
                       <details>
                         <summary className="cursor-pointer text-sm font-semibold text-royal">Record a payment</summary>
