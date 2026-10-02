@@ -98,13 +98,6 @@ export function inboxFor(db: AppDb, memberId: number, now: Date): InboxItem[] {
     for (const pay of db.select().from(payments).where(and(inArray(payments.projectId, ids), isNull(payments.verifiedBy))).all()) {
       if (pay.recordedBy !== memberId) push({ kind: "verify_payment", projectId: pay.projectId, title: "Check a payment against the bank statement", detail: `Ref ${pay.bankReference}`, href: `/projects/${pay.projectId}/finance`, at: pay.recordedAt });
     }
-    // Form 16A arrives quarterly; chase it once two months have passed, or the TDS credit is lost.
-    const chaseBefore = new Date(now.getTime() - TDS_CHASE_DAYS * 86_400_000).toISOString().slice(0, 10);
-    for (const pay of db.select().from(payments).where(and(inArray(payments.projectId, ids), eq(payments.tdsCertificateStatus, "pending"))).all()) {
-      if (pay.tdsDeducted > 0 && pay.receivedDate <= chaseBefore) {
-        push({ kind: "tds_certificate", projectId: pay.projectId, title: "Ask the client for the TDS certificate (Form 16A)", detail: `${formatINR(pay.tdsDeducted)} deducted from the payment of ${pay.receivedDate} (ref ${pay.bankReference})`, href: `/projects/${pay.projectId}/finance`, at: pay.receivedDate });
-      }
-    }
     const today = now.toISOString().slice(0, 10);
     for (const inv of db.select().from(invoices).where(inArray(invoices.projectId, ids)).all()) {
       if (overdueOn(inv, today)) push({ kind: "overdue_invoice", projectId: inv.projectId, title: `Invoice ${inv.number} is overdue`, detail: `Due ${inv.msmeDueDate ?? inv.dueDate}`, href: `/projects/${inv.projectId}/finance`, at: inv.dueDate });
@@ -126,6 +119,20 @@ export function inboxFor(db: AppDb, memberId: number, now: Date): InboxItem[] {
   }
   for (const v of db.select().from(configVersions).where(eq(configVersions.status, "pending")).all()) {
     if (!hasVoted(db, "config_version", v.id, v.round, memberId)) push({ kind: "approve_version", projectId: null, title: `Approve rules v${v.version}`, detail: v.note, href: "/settings", at: v.createdAt });
+  }
+  // Form 16A arrives quarterly; chase it once two months have passed, or the TDS credit is lost.
+  const chaseBefore = new Date(now.getTime() - TDS_CHASE_DAYS * 86_400_000).toISOString().slice(0, 10);
+  // Includes closed projects: the certificate can still be recorded after closure.
+  const allMine = db
+    .select({ id: projects.id, name: projects.name, code: projects.code })
+    .from(projects)
+    .innerJoin(projectMembers, and(eq(projectMembers.projectId, projects.id), eq(projectMembers.memberId, memberId), eq(projectMembers.active, true)))
+    .all();
+  for (const p of allMine) if (!name.has(p.id)) name.set(p.id, `${p.code} · ${p.name}`);
+  for (const pay of db.select().from(payments).where(and(inArray(payments.projectId, allMine.map((p) => p.id)), eq(payments.tdsCertificateStatus, "pending"))).all()) {
+    if (pay.tdsDeducted > 0 && pay.receivedDate <= chaseBefore) {
+      push({ kind: "tds_certificate", projectId: pay.projectId, title: "Ask the client for the TDS certificate (Form 16A)", detail: `${formatINR(pay.tdsDeducted)} deducted from the payment of ${pay.receivedDate} (ref ${pay.bankReference})`, href: `/projects/${pay.projectId}/finance`, at: pay.receivedDate });
+    }
   }
   const st = db.select().from(studio).get();
   if (st) {

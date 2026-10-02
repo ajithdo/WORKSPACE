@@ -140,7 +140,10 @@ describe("late TDS certificate", () => {
     const pay = f.db.select().from(payments).where(eq(payments.projectId, f.projectId)).get()!;
     expect(pay.tdsCertificateStatus).toBe("pending");
     expect(() => f.db.update(payments).set({ amountReceived: 1 }).where(eq(payments.id, pay.id)).run()).toThrow(/closed and locked/);
+    const { inboxFor } = await import("@/server/inbox");
+    expect(inboxFor(f.db, f.b, new Date("2026-12-10T00:00:00Z")).some((i) => i.kind === "tds_certificate" && i.projectName.includes("Sunrise"))).toBe(true);
     recordTdsCertificate(f.at(f.b), pay.id, {});
+    expect(inboxFor(f.db, f.b, new Date("2026-12-10T00:00:00Z")).some((i) => i.kind === "tds_certificate")).toBe(false);
     expect(f.db.select().from(payments).where(eq(payments.id, pay.id)).get()?.tdsCertificateStatus).toBe("received");
     expect(() => recordTdsCertificate(f.at(f.b), pay.id, {})).toThrow(/already recorded/);
     expect(() => f.db.update(payments).set({ tdsCertificateStatus: "pending" }).where(eq(payments.id, pay.id)).run()).toThrow(/closed and locked/);
