@@ -19,9 +19,10 @@ COPY --from=build --chown=app /app/.next/static ./.next/static
 # Migrations and the seed library are read from the working directory at runtime.
 COPY --from=build --chown=app /app/drizzle ./drizzle
 COPY --from=build --chown=app /app/seed ./seed
-USER app
+COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 VOLUME ["/data"]
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["node", "server.js"]
