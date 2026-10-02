@@ -1,9 +1,11 @@
 "use server";
 
 import { OWNER_ROLES } from "@/domain/types";
+import { cookies } from "next/headers";
 import { runAction, type ActionState } from "@/lib/actions";
+import { SESSION_COOKIE } from "@/lib/session";
 import { bool, num, str } from "@/lib/form";
-import { addMember, changePassword, updateMember } from "@/server/auth";
+import { addMember, changePassword, signOutOtherSessions, updateMember } from "@/server/auth";
 import { decideReserveEntry } from "@/server/finance";
 import { updateStudio } from "@/server/settings";
 import { createDraftConfig, decideConfig, submitConfig, updateDraftConfig } from "@/server/versions";
@@ -34,7 +36,17 @@ export async function updateMemberAction(memberId: number, _p: ActionState, fd: 
   return runAction((ctx) => updateMember(ctx, memberId, { name: str(fd, "name"), roles: rolesFrom(fd), active: bool(fd, "active") }), "Saved");
 }
 export async function changePasswordAction(_p: ActionState, fd: FormData) {
-  return runAction((ctx) => changePassword(ctx, { current: String(fd.get("current") ?? ""), next: String(fd.get("next") ?? "") }), "Password changed");
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  return runAction((ctx) => {
+    changePassword(ctx, { current: String(fd.get("current") ?? ""), next: String(fd.get("next") ?? "") });
+    signOutOtherSessions(ctx.db, ctx.actorId!, token);
+  }, "Password changed. Your other devices are signed out.");
+}
+export async function signOutOthersAction(_p: ActionState) {
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  return runAction((ctx) => {
+    signOutOtherSessions(ctx.db, ctx.actorId!, token);
+  }, "Signed out everywhere else");
 }
 export async function newRulesDraftAction(_p: ActionState, fd: FormData) {
   return runAction((ctx) => createDraftConfig(ctx, str(fd, "note")), "Draft created");

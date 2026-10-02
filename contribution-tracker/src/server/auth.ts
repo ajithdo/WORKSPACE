@@ -1,5 +1,5 @@
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 import type { AppDb } from "@/db";
 import { members, sessions, studio } from "@/db/schema";
 import { appendAudit } from "./audit";
@@ -164,6 +164,12 @@ export function memberForSession(db: AppDb, now: Date, token: string | undefined
 
 export function logout(db: AppDb, token: string | undefined | null) {
   if (token) db.delete(sessions).where(eq(sessions.id, tokenId(token))).run();
+}
+
+/** Ends every session of this member except the one with `keepToken` (the device they are using). */
+export function signOutOtherSessions(db: AppDb, memberId: number, keepToken: string | null | undefined): number {
+  const keep = keepToken ? tokenId(keepToken) : "";
+  return db.delete(sessions).where(and(eq(sessions.memberId, memberId), ne(sessions.id, keep))).run().changes;
 }
 
 export function changePassword(ctx: Ctx, input: { current: string; next: string }) {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addMember, changePassword, login, logout, memberForSession, resetPassword, setupStudio } from "@/server/auth";
+import { addMember, changePassword, login, logout, memberForSession, resetPassword, setupStudio, signOutOtherSessions } from "@/server/auth";
 import { ctxFor, T0, testDb } from "../helpers";
 
 const later = (ms: number) => new Date(T0.getTime() + ms);
@@ -78,5 +78,16 @@ describe("password reset", () => {
   it("fails for an unknown email", () => {
     const { db } = setup();
     expect(() => resetPassword(db, T0, "nobody@studio.test")).toThrow(/No member/);
+  });
+});
+
+describe("other devices", () => {
+  it("signs out every other session but keeps the current one", () => {
+    const { db, a } = setup();
+    const phone = login(db, T0, { email: "asha@studio.test", password: "correct horse battery", ip: "1.1.1.20" });
+    const laptop = login(db, T0, { email: "asha@studio.test", password: "correct horse battery", ip: "1.1.1.21" });
+    expect(signOutOtherSessions(db, a, laptop.token)).toBe(1);
+    expect(memberForSession(db, later(1000), phone.token)).toBeNull();
+    expect(memberForSession(db, later(1000), laptop.token)?.id).toBe(a);
   });
 });

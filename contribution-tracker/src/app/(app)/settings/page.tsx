@@ -15,6 +15,7 @@ import { getStudio } from "@/server/settings";
 import {
   addMemberAction,
   changePasswordAction,
+  signOutOthersAction,
   decideReserveAction,
   decideRulesAction,
   editRulesAction,
@@ -242,6 +243,9 @@ export default async function SettingsPage() {
             </div>
           </ActionForm>
         </details>
+        <div className="mt-3">
+          <ActionButton action={signOutOthersAction} label="Sign out my other devices" variant="quiet" />
+        </div>
         <details id="password" className="mt-3" open={me.mustChangePassword}>
           <summary className="cursor-pointer font-semibold text-royal">Change my password</summary>
           <ActionForm action={changePasswordAction} className="mt-2 grid max-w-sm gap-2" resetOnSuccess>
