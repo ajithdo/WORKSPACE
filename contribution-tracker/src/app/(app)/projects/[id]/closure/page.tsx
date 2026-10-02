@@ -191,7 +191,7 @@ export default async function ClosurePage({ params }: { params: Promise<{ id: st
                 <Link className="font-semibold text-royal hover:underline" href={`/projects/${projectId}/statement/${s.id}`}>
                   Printable contribution statement
                 </Link>
-                <ActionButton action={reverifyAction.bind(null, s.id)} label="Re-verify hash" variant="quiet" />
+                <ActionButton action={reverifyAction.bind(null, s.id)} label="Re-verify hash" variant="quiet" showResult />
               </div>
             </div>
           );

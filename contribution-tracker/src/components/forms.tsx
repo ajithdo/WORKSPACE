@@ -115,6 +115,7 @@ export function ActionButton({
   confirm,
   size = "sm",
   hidden,
+  showResult = false,
 }: {
   action: Action;
   label: string;
@@ -122,9 +123,11 @@ export function ActionButton({
   confirm?: string;
   size?: "sm" | "md";
   hidden?: Record<string, string | number>;
+  /** Show the action's success message (for checks whose result is the point, like "Re-verify hash"). */
+  showResult?: boolean;
 }) {
   return (
-    <ActionForm action={action} className="inline-block" showSuccess={false}>
+    <ActionForm action={action} className="inline-block" showSuccess={showResult}>
       {hidden ? Object.entries(hidden).map(([k, v]) => <input key={k} type="hidden" name={k} value={String(v)} />) : null}
       <SubmitButton variant={variant} confirm={confirm} size={size}>
         {label}
