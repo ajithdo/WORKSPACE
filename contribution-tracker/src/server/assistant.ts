@@ -210,7 +210,9 @@ export async function runCompletionCheck(ctx: Ctx, projectId: number, input: { u
     throw aiError(e);
   }
   const known = new Set(tasks.map((t) => t.code));
-  output = { ...output, tasks: output.tasks.filter((t) => known.has(t.code)) };
+  // The model reads untrusted site content, so only plain web links survive into the report.
+  const webLink = (u: string | null) => (u && /^https?:\/\/[^\s]+$/i.test(u) ? u : null);
+  output = { ...output, tasks: output.tasks.filter((t) => known.has(t.code)).map((t) => ({ ...t, evidenceUrl: webLink(t.evidenceUrl) })) };
   return ctx.db.transaction((tx) => {
     const id = tx
       .insert(aiReports)

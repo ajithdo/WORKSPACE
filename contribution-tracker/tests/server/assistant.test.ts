@@ -111,3 +111,18 @@ describe("daily limit", () => {
     }
   });
 });
+
+describe("links from model output", () => {
+  it("drops anything that is not a plain web link", async () => {
+    const f = bootstrap();
+    setAiClientFactory(
+      fakeClient({
+        summary: "x",
+        tasks: [{ code: "AI-05", verdict: "done", confidence: "high", reason: "r", evidenceUrl: "javascript:alert(1)", evidenceType: "url_live" }],
+      }),
+    );
+    const { reportId } = await runCompletionCheck(f.at(f.a), f.projectId, { url: null, notes: "Added the sitemap" });
+    const r = f.db.select().from(aiReports).where(eq(aiReports.id, reportId)).get();
+    expect((r?.output as { tasks: { evidenceUrl: string | null }[] }).tasks[0]?.evidenceUrl).toBeNull();
+  });
+});

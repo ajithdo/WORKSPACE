@@ -23,7 +23,8 @@ export async function loginAction(_prev: ActionState, fd: FormData): Promise<Act
     return { ok: false, error: errorMessage(e), at: Date.now() };
   }
   const next = str(fd, "next");
-  redirect(next.startsWith("/") && !next.startsWith("//") ? next : "/");
+  // Same-site paths only: "//host" and "/\\host" are treated as other sites by browsers.
+  redirect(/^\/(?![/\\])/.test(next) ? next : "/");
 }
 
 export async function logoutAction() {

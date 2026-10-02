@@ -11,6 +11,9 @@ import { acceptAction, addLibraryAction, addNewTaskAction, completionCheckAction
 
 export const metadata = { title: "AI assistant" };
 
+/** Links in AI output come from web content; only plain web links are rendered. */
+const isWebLink = (u: string) => /^https?:\/\/[^\s]+$/i.test(u);
+
 export default async function AssistantPage({ params }: { params: Promise<{ id: string }> }) {
   await requireMember();
   const projectId = Number((await params).id);
@@ -126,7 +129,7 @@ export default async function AssistantPage({ params }: { params: Promise<{ id: 
               {s.exampleUrls.length ? (
                 <p>
                   Examples:{" "}
-                  {s.exampleUrls.slice(0, 3).map((u) => (
+                  {s.exampleUrls.filter(isWebLink).slice(0, 3).map((u) => (
                     <a key={u} href={u} target="_blank" rel="noopener noreferrer nofollow" className="mr-2 font-semibold text-royal hover:underline">
                       {u.replace(/^https?:\/\//, "").slice(0, 40)}
                     </a>
@@ -154,7 +157,7 @@ export default async function AssistantPage({ params }: { params: Promise<{ id: 
           <summary className="cursor-pointer font-semibold text-royal">Full brief and {report.sources.length} sources</summary>
           <div className="mt-2 whitespace-pre-wrap text-sm">{report.brief}</div>
           <ul className="mt-2 list-disc pl-5 text-sm">
-            {report.sources.map((s) => (
+            {report.sources.filter((s) => isWebLink(s.url)).map((s) => (
               <li key={s.url}>
                 <a href={s.url} target="_blank" rel="noopener noreferrer nofollow" className="text-royal hover:underline">
                   {s.title}
