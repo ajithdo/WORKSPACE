@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { eq } from "drizzle-orm";
-import { formatDate, KeyValue, Money, Note, Points, Section } from "@/components/ui";
+import { ActionForm, SubmitButton } from "@/components/forms";
+import { Field, formatDate, KeyValue, Money, Note, Points, Section } from "@/components/ui";
 import { getDb } from "@/db";
 import { configVersions, taskInstances } from "@/db/schema";
-import { stateName } from "@/lib/states";
+import { INDIAN_STATES, stateName } from "@/lib/states";
 import { requireMember } from "@/lib/session";
 import { loadProject } from "@/server/common";
 import { plannedTotal } from "@/server/contribution";
 import { financeSummary } from "@/server/finance";
 import { projectMilestones } from "@/server/milestones";
 import { memberNames, projectHeader } from "@/server/queries";
+import { updateDetailsAction } from "./actions";
 
 export default async function ProjectOverview({ params }: { params: Promise<{ id: string }> }) {
   await requireMember();
@@ -115,6 +117,82 @@ export default async function ProjectOverview({ params }: { params: Promise<{ id
                 ["Rules version", `v${db.select({ v: configVersions.version }).from(configVersions).where(eq(configVersions.id, p.configVersionId)).get()?.v ?? "?"}`],
               ]}
             />
+            {p.closeStatus === "open" ? (
+              <details className="mt-4">
+                <summary className="cursor-pointer text-sm font-semibold text-royal">Edit project details</summary>
+                <ActionForm action={updateDetailsAction.bind(null, projectId, p.planStatus === "draft")} className="mt-3 grid gap-3 text-sm">
+                  <Field label="Project name">
+                    <input className="field-input" name="name" defaultValue={p.name} required />
+                  </Field>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="Start">
+                      <input className="field-input" type="date" name="start_date" defaultValue={p.startDate ?? ""} />
+                    </Field>
+                    <Field label="Target launch">
+                      <input className="field-input" type="date" name="target_launch_date" defaultValue={p.targetLaunchDate ?? ""} />
+                    </Field>
+                  </div>
+                  <Field label="Place of supply" hint="The client's state decides CGST+SGST or IGST.">
+                    <select className="field-input" name="place_of_supply" defaultValue={p.placeOfSupplyState}>
+                      <option value="">Not set</option>
+                      {INDIAN_STATES.map((st) => (
+                        <option key={st.code} value={st.code}>
+                          {st.name}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field label="Quoted amount before GST (₹)">
+                    <input className="field-input" name="quoted" inputMode="decimal" defaultValue={String(p.quotedAmountExGst / 100)} />
+                  </Field>
+                  <Field label="Brought in by" hint={p.planStatus === "draft" ? undefined : "Fixed once the plan is locked."}>
+                    <select className="field-input" name="originated_by" defaultValue={p.originatedBy ? String(p.originatedBy) : ""} disabled={p.planStatus !== "draft"}>
+                      <option value="">Nobody</option>
+                      {members.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.name}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <fieldset className="grid gap-1.5">
+                    <legend className="mb-1 font-semibold">Payment schedule (must add up to 100%)</legend>
+                    {Array.from({ length: 6 }, (_, i) => {
+                      const e = p.paymentSchedule[i];
+                      return (
+                        <div key={i} className="grid grid-cols-[4.5rem_1fr] gap-1.5">
+                          <input className="field-input" name={`pct_${i}`} inputMode="decimal" defaultValue={e ? String(e.pct) : ""} placeholder="%" aria-label={`Payment ${i + 1} percent`} />
+                          <select className="field-input" name={`ms_${i}`} defaultValue={e?.milestoneCode ?? ""} aria-label={`Payment ${i + 1} milestone`}>
+                            <option value="">No milestone</option>
+                            {config.milestones.map((m) => (
+                              <option key={m.code} value={m.code}>
+                                {m.code} {m.name}
+                              </option>
+                            ))}
+                          </select>
+                          <input className="field-input col-span-2" name={`note_${i}`} defaultValue={e?.note ?? ""} placeholder="Note, e.g. advance on signing" aria-label={`Payment ${i + 1} note`} />
+                        </div>
+                      );
+                    })}
+                  </fieldset>
+                  <label className="flex items-start gap-2">
+                    <input type="checkbox" name="msme" defaultChecked={p.msmeApplicable} className="mt-1" /> MSME 45-day payment rule applies
+                  </label>
+                  <label className="flex items-start gap-2">
+                    <input type="checkbox" name="deemed_clause" defaultChecked={p.deemedAcceptanceClause} className="mt-1" /> The contract has a deemed-acceptance clause
+                  </label>
+                  <Field label="Deemed acceptance after (days)">
+                    <input className="field-input w-28" name="deemed_days" inputMode="numeric" defaultValue={p.deemedAcceptanceDays ?? ""} />
+                  </Field>
+                  <Field label="Notes">
+                    <textarea className="field-input" name="notes" rows={3} defaultValue={p.notes} />
+                  </Field>
+                  <div>
+                    <SubmitButton variant="secondary">Save details</SubmitButton>
+                  </div>
+                </ActionForm>
+              </details>
+            ) : null}
           </Section>
         </aside>
       </div>

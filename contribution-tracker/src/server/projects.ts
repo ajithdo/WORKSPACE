@@ -23,7 +23,7 @@ import {
 } from "@/db/schema";
 import type { Ctx } from "./context";
 import { addHours, iso } from "./context";
-import { assertProjectOpen, audit, configById, loadProject, nonEmpty, projectMemberIds, requireActor, type ProjectRow } from "./common";
+import { assertProjectMember, assertProjectOpen, audit, configById, loadProject, nonEmpty, projectMemberIds, requireActor, type ProjectRow } from "./common";
 import { DomainError } from "./errors";
 
 export interface CreateProjectInput {
@@ -293,10 +293,11 @@ export function updateProjectDetails(
     paymentSchedule?: PaymentScheduleEntry[];
   },
 ) {
-  requireActor(ctx);
+  const actor = requireActor(ctx);
   ctx.db.transaction((tx) => {
     const p = loadProject(tx, projectId);
     assertProjectOpen(p);
+    assertProjectMember(tx, projectId, actor);
     if (patch.originatedBy !== undefined && patch.originatedBy !== p.originatedBy && p.planStatus !== "draft") {
       throw new DomainError("locked", "Origination credit is part of the locked plan and cannot change now");
     }
