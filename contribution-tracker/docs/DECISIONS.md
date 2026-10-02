@@ -114,6 +114,12 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 
 31. **GSTIN check character.** Every GSTIN entered (studio or client) is checked for format, its mod-36 check character and its state code. A typo on an invoice would cost the client their input tax credit, so it is caught before it is saved.
 
+32. **Commits as evidence (GitHub webhook).** The spec's "later" Git integration is in place:
+    - A signed GitHub push webhook (HMAC-SHA256 with `GITHUB_WEBHOOK_SECRET`) turns every commit that names a task code into `git_commit` evidence on that task.
+    - The evidence is credited to the project member whose sign-in email matches the commit author.
+    - Evidence goes through the normal secret scan and is never duplicated on redelivery. It never submits or verifies anything.
+    - Off unless the secret is set.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens

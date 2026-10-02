@@ -84,6 +84,12 @@ Claude features need an Anthropic API key. Create one at https://console.anthrop
 
 The server refuses to fetch loopback, link-local (cloud metadata) and multicast addresses, so the site check works on staging and live addresses, not on `localhost`.
 
+## Commits as evidence (optional)
+
+Set `GITHUB_WEBHOOK_SECRET` in `.env` and restart. Each project's **AI assistant** tab then shows a webhook address to add in the GitHub repository (Settings → Webhooks; content type `application/json`; the same secret; push events only).
+
+Write the task code in the commit message, e.g. `AI-05: add sitemap.xml`. Every push then adds that commit as strong evidence on the task, credited to the partner whose sign-in email matches the commit author. Commits containing anything that looks like a secret are refused, and redelivered pushes are ignored. Nothing is submitted or verified automatically.
+
 ## Development
 
 ```bash

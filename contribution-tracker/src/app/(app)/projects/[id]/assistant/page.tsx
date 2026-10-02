@@ -1,4 +1,5 @@
 import { ActionButton, ActionForm, SubmitButton } from "@/components/forms";
+import { headers } from "next/headers";
 import { Field, formatDateTime, Note, Pill, Section } from "@/components/ui";
 import type { SiteCheck } from "@/domain/siteRules";
 import { getDb } from "@/db";
@@ -21,6 +22,9 @@ export default async function AssistantPage({ params }: { params: Promise<{ id: 
   const p = loadProject(db, projectId);
   const open = p.closeStatus !== "closed_locked";
   const ai = aiConfigured();
+  const webhookOn = !!process.env.GITHUB_WEBHOOK_SECRET;
+  const h = await headers();
+  const origin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("x-forwarded-host") ?? h.get("host") ?? "your-server"}`;
   const reports = reportsFor({ db }, projectId);
   const tasks = db.select().from(taskInstances).where(eq(taskInstances.projectId, projectId)).all();
   const byCode = new Map(tasks.map((t) => [t.code, t]));
@@ -114,6 +118,22 @@ export default async function AssistantPage({ params }: { params: Promise<{ id: 
           )}
         </Section>
       ))}
+      <Section title="Commits as evidence (GitHub)" description="Write the task code in your commit message, for example “AI-05: add sitemap”. Each push adds the commit as strong evidence on that task, in the name of the partner whose email matches the commit author. You still submit; your partner still verifies.">
+        {webhookOn ? (
+          <ol className="list-decimal space-y-1 pl-5 text-sm">
+            <li>
+              In the GitHub repository: Settings → Webhooks → Add webhook.
+            </li>
+            <li>
+              Payload URL: <code className="break-all rounded bg-page px-1">{`${origin}/api/webhooks/github/${p.code}`}</code>
+            </li>
+            <li>Content type: application/json. Secret: the GITHUB_WEBHOOK_SECRET from the server&apos;s .env. Events: just the push event.</li>
+            <li>Use the same email for git commits as for signing in here (git config user.email).</li>
+          </ol>
+        ) : (
+          <p className="text-sm text-ink-soft">Off. To turn it on, set GITHUB_WEBHOOK_SECRET in the server&apos;s .env (any long random text) and restart; the setup steps then appear here.</p>
+        )}
+      </Section>
     </>
   );
 
