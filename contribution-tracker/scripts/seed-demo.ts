@@ -34,7 +34,7 @@ const { projectId } = createProject(ctx(a), {
   name: "Sunrise Bakery website",
   kind: "client",
   projectType: "brochure",
-  newClient: { businessName: "Sunrise Bakery", stateCode: "36" },
+  newClient: { businessName: "Sunrise Bakery", stateCode: "36", contactName: "Ravi", contactEmail: "ravi@sunrise-bakery.test", contactPhone: "98765 43210" },
   originatedBy: b,
   quotedAmountExGst: 6_000_000,
 });
@@ -62,7 +62,8 @@ function complete(code: string) {
 for (const code of ["H-05", "I-02"]) complete(code);
 submitPlan(ctx(a), projectId);
 approvePlan(ctx(b), projectId);
-const today = new Date().toISOString().slice(0, 10);
-const { invoiceId } = createInvoice(ctx(b), projectId, { type: "advance", issueDate: today, dueDate: today, amountExGst: 3_000_000, tdsExpectedRateBp: 200});
+// The advance invoice went out three weeks ago and is overdue, so the reminder panel shows.
+const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString().slice(0, 10);
+const { invoiceId } = createInvoice(ctx(b), projectId, { type: "advance", issueDate: daysAgo(21), dueDate: daysAgo(14), amountExGst: 3_000_000, tdsExpectedRateBp: 200 });
 issueInvoice(ctx(b), invoiceId);
 console.log(`Demo studio ready: project ${projectId}, plan locked, gate 1 open.`);

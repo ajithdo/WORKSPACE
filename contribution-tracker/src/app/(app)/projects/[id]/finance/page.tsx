@@ -8,6 +8,8 @@ import { expenses, invoices, payments, reserveLedger } from "@/db/schema";
 import { requireMember } from "@/lib/session";
 import { financeSummary, isSettled, overdueOn, reserveBalance } from "@/server/finance";
 import { projectHeader } from "@/server/queries";
+import { reminderMessage, whatsappNumber } from "@/domain/reminders";
+import { ReminderPanel } from "./reminder";
 import { getStudio } from "@/server/settings";
 import {
   addExpenseAction,
@@ -29,7 +31,7 @@ export default async function FinancePage({ params }: { params: Promise<{ id: st
   const me = await requireMember();
   const projectId = Number((await params).id);
   const db = getDb();
-  const { project: p, members, config } = projectHeader(db, projectId);
+  const { project: p, client, members, config } = projectHeader(db, projectId);
   const studio = getStudio(db);
   const open = p.closeStatus !== "closed_locked";
   const today = new Date().toISOString().slice(0, 10);
@@ -119,6 +121,23 @@ export default async function FinancePage({ params }: { params: Promise<{ id: st
                   {inv.msmeDueDate ? `, MSME due ${formatDate(inv.msmeDueDate)}` : ""}. {formatINR(inv.amountExGst)} + {inv.igst ? `IGST ${formatINR(inv.igst)}` : `CGST ${formatINR(inv.cgst)} + SGST ${formatINR(inv.sgst)}`}
                   {inv.tdsExpectedRateBp ? `. Expect ${inv.tdsExpectedRateBp / 100}% TDS` : ""}. Settled {formatINR(settled)}.
                 </p>
+                {overdue && inv.number && open
+                  ? (() => {
+                      const m = reminderMessage({
+                        studioName: studio?.legalName || studio?.name || "",
+                        clientName: client?.businessName ?? "",
+                        contactName: client?.contactName ?? "",
+                        invoiceNumber: inv.number,
+                        issueDate: inv.issueDate,
+                        dueDate: inv.msmeDueDate ?? inv.dueDate,
+                        outstandingPaise: Math.max(0, inv.total - settled),
+                        today,
+                        msme: !!studio?.msmeRegistered && p.msmeApplicable,
+                        udyamNumber: studio?.udyamNumber ?? "",
+                      });
+                      return <ReminderPanel {...m} email={client?.contactEmail ?? ""} whatsapp={whatsappNumber(client?.contactPhone ?? "")} />;
+                    })()
+                  : null}
                 {ps.length ? (
                   <table className="ledger-table mt-2 text-sm">
                     <thead>

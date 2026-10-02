@@ -58,6 +58,13 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 
 16. **Printable GST tax invoice.** Each invoice opens as a print-ready page (save as PDF from the browser). It carries the particulars rule 46 of the CGST Rules asks for: supplier and recipient names, addresses and GSTINs, serial number, date, place of supply, SAC 998314, taxable value, CGST+SGST or IGST with rates, total, amount in words (Indian lakh/crore system), reverse-charge status and a signature block. It also includes a TDS certificate request and the MSME 45-day notice. Drafts are watermarked and have no number, so the GST series stays gapless.
 
+17. **Payment reminders.** An overdue invoice shows a ready-to-send reminder, with links that open WhatsApp (Indian numbers get +91) or email. The partner sends it from their own phone or mail, and the app sends nothing itself. The tone is gentle in the first week, firm up to 30 days, and final after that. For Udyam-registered studios, the firm and final reminders cite MSMED Act section 16 interest, and the final one mentions the MSME Samadhaan portal.
+18. **Accountant export.** Settings → "For your accountant" downloads CSVs per financial year:
+    - Issued invoices, in number order, with GSTIN, place of supply, SAC, taxable value and CGST/SGST/IGST, for GSTR-1.
+    - Payments received, with TDS and certificate status, for matching against Form 26AS.
+
+    Cells that start with spreadsheet formula characters are neutralised.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens

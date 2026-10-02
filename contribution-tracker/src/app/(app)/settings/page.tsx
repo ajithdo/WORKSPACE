@@ -6,6 +6,7 @@ import { getDb } from "@/db";
 import { configVersions, reserveLedger } from "@/db/schema";
 import { INDIAN_STATES } from "@/lib/states";
 import { requireMember } from "@/lib/session";
+import { accountYears } from "@/server/accounts";
 import { hasVoted } from "@/server/approvals";
 import { listMembers } from "@/server/auth";
 import { reserveBalance } from "@/server/finance";
@@ -51,6 +52,7 @@ const NUM = [
 export default async function SettingsPage() {
   const me = await requireMember();
   const db = getDb();
+  const years = accountYears(db);
   const studio = getStudio(db);
   const members = listMembers(db);
   const versions = db.select().from(configVersions).orderBy(desc(configVersions.version)).all();
@@ -285,6 +287,31 @@ export default async function SettingsPage() {
             <SubmitButton variant="secondary">Save studio details</SubmitButton>
           </div>
         </ActionForm>
+      </Section>
+
+      <Section title="For your accountant" description="Issued invoices (for GSTR-1) and payments received with TDS (to match Form 26AS) for one financial year, as spreadsheets.">
+        {years.length ? (
+          <form action="/export/accounts" method="get" className="flex flex-wrap items-end gap-3">
+            <label className="text-sm font-semibold">
+              Financial year
+              <select name="fy" className="field-input mt-1 block" defaultValue={years[0]}>
+                {years.map((y) => (
+                  <option key={y} value={y}>
+                    FY 20{y.replace("-", "–")}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button type="submit" name="kind" value="invoices" className="rounded-md border border-rule-strong px-4 py-2 font-semibold text-royal hover:border-royal">
+              Invoices CSV
+            </button>
+            <button type="submit" name="kind" value="payments" className="rounded-md border border-rule-strong px-4 py-2 font-semibold text-royal hover:border-royal">
+              Payments CSV
+            </button>
+          </form>
+        ) : (
+          <p className="text-sm text-ink-soft">Nothing to export yet. Issued invoices and payments appear here by financial year.</p>
+        )}
       </Section>
 
       <Section title="Backups" description="Everything lives in one folder on your server (DATA_DIR): the database and uploaded files. Copy that folder somewhere safe regularly, or download here.">
