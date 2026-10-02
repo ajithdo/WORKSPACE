@@ -10,6 +10,11 @@ on:
 permissions:
   contents: read
 
+# A newer push to the same branch makes the running checks obsolete.
+concurrency:
+  group: contribution-tracker-${{ github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     working-directory: contribution-tracker
