@@ -156,8 +156,11 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
                         <td>
                           {t.shares.length > 1 ? (
                             <span className="text-sm">{t.shares.map((s) => `${names.get(s.memberId)?.split(" ")[0]} ${s.shareBp / 100}%`).join(", ")}</span>
+                          ) : editable(t.status) ? (
+                            <OwnerSelect action={setOwnerAction.bind(null, t.id)} members={members} value={t.shares[0]?.memberId ?? t.ownerMemberId} label={`Owner of ${t.code}`} />
                           ) : (
-                            <OwnerSelect action={setOwnerAction.bind(null, t.id)} members={members} value={t.shares[0]?.memberId ?? t.ownerMemberId} disabled={!editable(t.status)} label={`Owner of ${t.code}`} />
+                            // Read-only once the plan is locked: plain text keeps the page light (no per-row form).
+                            <span className="text-sm">{names.get(t.shares[0]?.memberId ?? t.ownerMemberId ?? 0) ?? "—"}</span>
                           )}
                         </td>
                         <td className="num">
