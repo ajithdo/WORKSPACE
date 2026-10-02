@@ -10,7 +10,7 @@ async function signIn(browser: Browser, email: string, password: string): Promis
   return page;
 }
 
-test("setup → create project → both partners lock the plan → preview and assistant", async ({ browser, page }) => {
+test("setup → create project → both partners lock the plan → task done and verified → preview and assistant", async ({ browser, page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
 
@@ -46,6 +46,31 @@ test("setup → create project → both partners lock the plan → preview and a
   await bala.goto(projectPath + "/plan");
   await bala.getByRole("button", { name: "Approve and lock" }).click();
   await expect(bala.getByText(/locked/i).first()).toBeVisible();
+
+  // The task's owner starts it, adds evidence and submits; the other partner verifies.
+  await page.goto(projectPath + "/plan");
+  const taskHref = await page.getByRole("row").filter({ has: page.getByRole("cell", { name: "A-03", exact: true }) }).getByRole("link").first().getAttribute("href");
+  expect(taskHref).toBeTruthy();
+  await page.goto(taskHref!);
+  await bala.goto(taskHref!);
+  const ashaOwns = await page.getByRole("button", { name: "Start work" }).isVisible();
+  const [doer, checker] = ashaOwns ? [page, bala] : [bala, page];
+  await doer.getByRole("button", { name: "Start work" }).click();
+  await expect(doer.getByRole("button", { name: "Add evidence" })).toBeVisible();
+  await doer.selectOption('select[name="type"]', "git_commit");
+  await doer.fill('input[name="external_ref"]', "4f2a9c1");
+  await doer.fill('textarea[name="description"]', "Lead logged in the CRM sheet with source and status");
+  await doer.check('input[name="no_secrets"]');
+  await doer.getByRole("button", { name: "Add evidence" }).click();
+  await expect(doer.getByRole("status").filter({ hasText: "Evidence added" })).toBeVisible();
+  await doer.getByRole("button", { name: "Submit for verification" }).click();
+  await expect(doer.getByRole("button", { name: "Submit for verification" })).toBeHidden();
+
+  await checker.reload();
+  await checker.getByRole("button", { name: "Verify" }).click();
+  await expect(checker.getByRole("button", { name: "Verify" })).toBeHidden();
+  await checker.goto(projectPath + "/contribution");
+  await expect(checker.getByText(/Where the points come from/)).toBeVisible();
 
   // Preview tab renders the address form and the framed viewer.
   await page.goto(projectPath + "/preview");
