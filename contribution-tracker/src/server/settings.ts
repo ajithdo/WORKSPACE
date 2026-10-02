@@ -20,7 +20,10 @@ export function updateStudio(
     if (!before) throw new DomainError("conflict", "Set up the studio first");
     if (patch.invoicePrefix !== undefined && !/^[A-Za-z0-9-]{1,6}$/.test(patch.invoicePrefix)) throw new DomainError("invalid", "Invoice prefix: 1–6 letters, digits or dashes");
     if (patch.gstin && !/^[0-9]{2}[A-Z0-9]{13}$/.test(patch.gstin.toUpperCase())) throw new DomainError("invalid", "GSTIN must be 15 characters starting with the state code");
-    const next = { ...patch, gstin: patch.gstin?.toUpperCase() ?? before.gstin, updatedAt: iso(ctx.now) };
+    const gstin = patch.gstin?.toUpperCase() ?? before.gstin;
+    const state = patch.stateCode ?? before.stateCode;
+    if (gstin && state && gstin.slice(0, 2) !== state) throw new DomainError("invalid", "The GSTIN's first two digits must match the studio's state");
+    const next = { ...patch, gstin, updatedAt: iso(ctx.now) };
     tx.update(studio).set(next).where(eq(studio.id, 1)).run();
     audit(tx, ctx, "studio.update", "studio", 1, null, before, next);
   });

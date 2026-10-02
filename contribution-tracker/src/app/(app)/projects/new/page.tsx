@@ -89,6 +89,9 @@ export default async function NewProjectPage() {
             <Field label="Contact phone">
               <input className="field-input" name="client_phone" />
             </Field>
+            <Field label="Billing address" hint="Printed on invoices and quotations.">
+              <textarea className="field-input" name="client_address" rows={2} />
+            </Field>
           </div>
         </fieldset>
         <div className="grid gap-3 sm:grid-cols-2">

@@ -32,7 +32,7 @@ export interface CreateProjectInput {
   projectType: ProjectType;
   multilingual?: boolean;
   clientId?: number | null;
-  newClient?: { businessName: string; stateCode: string; gstin?: string; contactName?: string; contactEmail?: string; contactPhone?: string } | null;
+  newClient?: { businessName: string; stateCode: string; gstin?: string; contactName?: string; contactEmail?: string; contactPhone?: string; address?: string } | null;
   originatedBy?: number | null;
   quotedAmountExGst?: number;
   placeOfSupplyState?: string;
@@ -107,6 +107,7 @@ export function createProject(ctx: Ctx, input: CreateProjectInput): { projectId:
             contactName: input.newClient.contactName?.trim() ?? "",
             contactEmail: input.newClient.contactEmail?.trim() ?? "",
             contactPhone: input.newClient.contactPhone?.trim() ?? "",
+            address: input.newClient.address?.trim() ?? "",
             createdBy: actor,
             createdAt: iso(ctx.now),
           })

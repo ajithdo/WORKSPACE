@@ -23,7 +23,7 @@ export async function createProjectAction(_prev: ActionState, fd: FormData): Pro
       clientId: clientChoice && clientChoice !== "new" ? Number(clientChoice) : null,
       newClient:
         kind === "client" && (!clientChoice || clientChoice === "new")
-          ? { businessName: str(fd, "client_name"), stateCode: str(fd, "client_state"), gstin: str(fd, "client_gstin"), contactName: str(fd, "client_contact"), contactEmail: str(fd, "client_email"), contactPhone: str(fd, "client_phone") }
+          ? { businessName: str(fd, "client_name"), stateCode: str(fd, "client_state"), gstin: str(fd, "client_gstin"), contactName: str(fd, "client_contact"), contactEmail: str(fd, "client_email"), contactPhone: str(fd, "client_phone"), address: str(fd, "client_address") }
           : null,
       originatedBy: originated ? Number(originated) : null,
       quotedAmountExGst: optMoney(fd, "quoted", "Quoted amount"),
