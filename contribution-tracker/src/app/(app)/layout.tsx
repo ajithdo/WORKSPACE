@@ -30,6 +30,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </span>
           </summary>
           <div className="space-y-4 px-3 pb-4">
+            <form method="get" action="/search" role="search">
+              <label htmlFor="nav-search-m" className="sr-only">
+                Search
+              </label>
+              <input id="nav-search-m" name="q" type="search" placeholder="Search…" className="w-full rounded-md border border-white/20 bg-white/10 px-3 py-1.5 text-sm text-white placeholder:text-white/50" />
+            </form>
             <SideNav items={nav} />
             <SignOut name={member.name} />
           </div>
@@ -38,6 +44,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <div>
             <p className="mb-1 px-3 text-lg font-bold leading-tight">{studio?.name ?? "Studio"}</p>
             <p className="mb-5 px-3 text-sm text-white/60">Contribution ledger</p>
+            <form method="get" action="/search" role="search" className="mb-4 px-3">
+              <label htmlFor="nav-search" className="sr-only">
+                Search
+              </label>
+              <input id="nav-search" name="q" type="search" placeholder="Search…" className="w-full rounded-md border border-white/20 bg-white/10 px-3 py-1.5 text-sm text-white placeholder:text-white/50 focus:bg-white/15 focus:outline-none" />
+            </form>
             <SideNav items={nav} />
           </div>
           <SignOut name={member.name} />

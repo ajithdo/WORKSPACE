@@ -105,8 +105,10 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 27. **Times and dates are India time.** Meeting times typed into the app are read as IST (UTC+05:30, no daylight saving) and shown in IST, whatever timezone the server runs in. Docker containers run in UTC, which used to shift times by 5½ hours. The "when did it happen" field defaults to now.
     - "Today" is also the India date everywhere: default invoice dates, overdue checks, backups and financial years. An invoice raised at 1 AM IST on 1 April belongs to the new financial year, not the old one.
 
+28. **Search.** A search box in the sidebar finds projects, clients (name, GSTIN, contact), invoice numbers, payment references (UTR) and tasks, limited to projects you are on. LIKE wildcards are matched literally.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens
 
-`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/report` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/invoice/[invoiceId]` · `…/quote` · `…/assistant` · `/summary` · `/guide` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.
+`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/report` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/invoice/[invoiceId]` · `…/quote` · `…/assistant` · `/summary` · `/guide` · `/search` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.
