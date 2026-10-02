@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { ActionForm, SubmitButton } from "@/components/forms";
 import { Field } from "@/components/ui";
 import { getDb } from "@/db";
@@ -39,7 +40,8 @@ function PartnerFields({ n, defaults }: { n: 1 | 2; defaults: string[] }) {
   );
 }
 
-export default function SetupPage() {
+export default async function SetupPage() {
+  await connection(); // decided per request, never at build time
   if (isSetUp(getDb())) redirect("/login");
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">

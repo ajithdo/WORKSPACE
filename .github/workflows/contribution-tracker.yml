@@ -46,6 +46,8 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      - name: Same flow against the production build
+        run: npm run build && E2E_PROD=1 E2E_PORT=3300 npm run test:e2e
       - if: failure()
         uses: actions/upload-artifact@v4
         with:

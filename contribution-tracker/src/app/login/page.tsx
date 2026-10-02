@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { ActionForm, SubmitButton } from "@/components/forms";
 import { Field } from "@/components/ui";
 import { getDb } from "@/db";
@@ -9,6 +10,7 @@ import { loginAction } from "../auth-actions";
 export const metadata = { title: "Sign in" };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+  await connection(); // decided per request, never at build time
   if (!isSetUp(getDb())) redirect("/setup");
   if (await currentMember()) redirect("/");
   const { next } = await searchParams;

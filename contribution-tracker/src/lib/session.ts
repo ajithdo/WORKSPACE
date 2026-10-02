@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { dataDir, getDb } from "@/db";
 import { isSetUp, memberForSession, type MemberRow } from "@/server/auth";
 import type { Ctx } from "@/server/context";
@@ -15,6 +16,9 @@ export async function currentMember(): Promise<MemberRow | null> {
 
 /** For every signed-in page and action: sends people to setup or login, and runs due timers. */
 export async function requireMember(): Promise<MemberRow> {
+  // better-sqlite3 answers synchronously, so without this the build would prerender the page with
+  // whatever the empty build-time database says (a redirect to /setup) and freeze it.
+  await connection();
   const db = getDb();
   if (!isSetUp(db)) redirect("/setup");
   const m = await currentMember();

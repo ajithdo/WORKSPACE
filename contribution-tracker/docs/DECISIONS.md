@@ -129,6 +129,12 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 
     The inbox stays the list of things to check for the other partner.
 
+34. **Production build safeguards.**
+    - Every signed-in page, plus login and setup, waits for the request (`connection()`) before touching the database. Otherwise `next build` pre-rendered them against the empty build-time database and froze them as "redirect to setup", so nobody could sign in on a production build.
+    - CI now runs the browser flow against the production build as well as the dev server.
+    - The standalone output excludes the data folder and the sources.
+    - `npm start` runs the same standalone server the Docker image uses.
+
 AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens

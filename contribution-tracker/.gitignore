@@ -12,3 +12,4 @@ playwright-report/
 .env
 .env.local
 .e2e-data/
+demo-data/

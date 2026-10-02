@@ -41,8 +41,8 @@ Requires Node 22+.
 
 ```bash
 npm ci
-npm run build
-DATA_DIR=./data npm start     # http://localhost:3000
+npm run build                 # also prepares .next/standalone (what the Docker image runs)
+DATA_DIR=./data npm start     # http://localhost:3000; DATA_DIR is relative to this folder
 ```
 
 To get a demo studio to click around:
@@ -96,7 +96,8 @@ Write the task code in the commit message, e.g. `AI-05: add sitemap.xml`. Every 
 npm run dev          # http://localhost:3000, data in ./data
 npm run typecheck
 npm test             # unit and service tests (Vitest), including a cross-check against reference_calc.py
-npm run test:e2e     # Playwright: setup → project → both partners lock the plan → preview/assistant
+npm run test:e2e     # Playwright against the dev server: setup → project → plan lock → task verified → pages
+npm run build && E2E_PROD=1 npm run test:e2e   # the same flow against the production build
 ```
 
 If Playwright's bundled Chromium is missing, set `PW_CHROMIUM=/path/to/chrome`.
