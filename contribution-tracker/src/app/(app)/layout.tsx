@@ -22,6 +22,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   ];
   return (
     <div className="md:grid md:min-h-dvh md:grid-cols-[15rem_1fr] print:block">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-paper focus:px-3 focus:py-2 focus:font-semibold focus:text-royal focus:shadow">
+        Skip to content
+      </a>
       <aside className="bg-ink text-white md:sticky md:top-0 md:h-dvh print:hidden">
         <details className="group md:hidden" open={false}>
           <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3">
@@ -56,7 +59,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <SignOut name={member.name} />
         </div>
       </aside>
-      <main className="min-w-0 px-3 py-4 md:px-8 md:py-8">
+      <main id="main" tabIndex={-1} className="min-w-0 px-3 py-4 focus:outline-none md:px-8 md:py-8">
         {member.mustChangePassword ? (
           <p role="alert" className="mx-auto mb-3 max-w-6xl rounded-md border border-ledger/40 bg-ledger/5 px-4 py-2 text-sm">
             You signed in with a temporary password. <a href="/settings#password" className="font-semibold text-royal underline">Choose your own password</a> before you continue.
