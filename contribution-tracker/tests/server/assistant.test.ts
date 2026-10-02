@@ -126,3 +126,29 @@ describe("links from model output", () => {
     expect((r?.output as { tasks: { evidenceUrl: string | null }[] }).tasks[0]?.evidenceUrl).toBeNull();
   });
 });
+
+describe("commits feed the completion check", () => {
+  it("runs on recent commits alone and passes them to Claude", async () => {
+    const { ingestGithubPush } = await import("@/server/gitWebhook");
+    const { projects } = await import("@/db/schema");
+    const f = bootstrap();
+    const code = f.db.select().from(projects).where(eq(projects.id, f.projectId)).get()!.code;
+    ingestGithubPush(f.db, f.at(f.a).now, code, { commits: [{ id: "e".repeat(40), message: "AI-05: add sitemap.xml generator", author: { email: "asha@studio.test" } }] });
+    let seen = "";
+    setAiClientFactory(
+      () =>
+        ({
+          beta: {
+            messages: {
+              parse: async (req: { messages: { content: string }[] }) => {
+                seen = req.messages[0]!.content;
+                return { stop_reason: "end_turn", parsed_output: { summary: "ok", tasks: [] } };
+              },
+            },
+          },
+        }) as never,
+    );
+    await runCompletionCheck(f.at(f.a), f.projectId, { url: null, notes: "" });
+    expect(seen).toContain("eeeeeee on AI-05: AI-05: add sitemap.xml generator");
+  });
+});

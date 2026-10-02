@@ -119,6 +119,7 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
     - The evidence is credited to the project member whose sign-in email matches the commit author.
     - Evidence goes through the normal secret scan and is never duplicated on redelivery. It never submits or verifies anything.
     - Off unless the secret is set.
+    - The "What did we finish?" check also reads the last two weeks of these commits, so after a vibe-coding session Claude sees what was built. It can run on commits alone, with no notes or site address.
 
 33. **My work.** Each partner's own tasks across open projects, grouped by what to do next:
     - sent back by the partner, with the reason;

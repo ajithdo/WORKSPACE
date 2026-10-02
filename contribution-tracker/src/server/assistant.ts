@@ -3,7 +3,7 @@ import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { and, desc, eq, gte, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { analyseSite, type SiteCheck } from "@/domain/siteRules";
-import { aiReports, projects, taskInstances, taskTemplates } from "@/db/schema";
+import { aiReports, evidence, projects, taskInstances, taskTemplates } from "@/db/schema";
 import type { Ctx } from "./context";
 import { iso, isoDate } from "./context";
 import { assertProjectMember, assertProjectOpen, audit, contributionsOf, loadProject, projectConfig, requireActor } from "./common";
@@ -141,6 +141,7 @@ For each task, decide whether the material shows it is done. Be conservative:
 - "done" only when the material directly shows the deliverable (for example the sitemap URL returns XML, the meta description is in the HTML, the notes name the merged pull request).
 - "partly" when some of it is visible. "unclear" when the material cannot show it either way (meetings, contracts, payments, client approvals). Never mark those "done" from a site snapshot.
 - Quote or name what you saw in "reason". Do not invent URLs: evidenceUrl must appear in the material, or be null.
+- Recent commits show that code was written for a task, not that the deliverable is live or accepted: alone they support "partly" unless the commit itself is the deliverable (for example a config or file that the task asks for).
 Only list tasks you can say something useful about; skip tasks the material does not touch.`;
 
 /** Claude calls allowed per day across the studio (completion checks + research). 0 turns the cap off. */
@@ -187,7 +188,20 @@ export async function runCompletionCheck(ctx: Ctx, projectId: number, input: { u
       `Visible text:\n${textOf(snap.html).slice(0, 20_000)}`,
     ].join("\n\n");
   }
-  if (!target && !notes) throw new DomainError("invalid", "Give a site address or paste notes from your build");
+  // Commits pushed through the GitHub webhook in the last two weeks are part of the material.
+  const since = new Date(ctx.now.getTime() - 14 * 86_400_000).toISOString();
+  const taskCode = new Map(ctx.db.select({ id: taskInstances.id, code: taskInstances.code }).from(taskInstances).where(eq(taskInstances.projectId, projectId)).all().map((t) => [t.id, t.code]));
+  const commits = ctx.db
+    .select()
+    .from(evidence)
+    .where(and(eq(evidence.projectId, projectId), eq(evidence.type, "git_commit"), gte(evidence.submittedAt, since)))
+    .orderBy(desc(evidence.submittedAt))
+    .limit(100)
+    .all();
+  const commitText = commits.length
+    ? commits.map((c) => `- ${c.externalRef?.slice(0, 7) ?? ""} on ${taskCode.get(c.subjectId) ?? "?"}: ${c.description}${c.url ? ` (${c.url})` : ""}`).join("\n")
+    : "(none)";
+  if (!target && !notes && !commits.length) throw new DomainError("invalid", "Give a site address or paste notes from your build");
   const taskList = tasks.map((t) => `${t.code} | ${t.name} | ${t.description.slice(0, 200)} | deliverable: ${t.deliverable} | evidence: ${t.evidenceExpected}`).join("\n");
   let output: CompletionOutput;
   try {
@@ -201,7 +215,7 @@ export async function runCompletionCheck(ctx: Ctx, projectId: number, input: { u
         { type: "text", text: COMPLETION_SYSTEM },
         { type: "text", text: `Open tasks (code | name | description | deliverable | evidence expected):\n${taskList}`, cache_control: { type: "ephemeral" } },
       ],
-      messages: [{ role: "user", content: `${siteText}\n\nBuilders' notes / repository summary:\n${notes || "(none)"}` }],
+      messages: [{ role: "user", content: `${siteText}\n\nBuilders' notes / repository summary:\n${notes || "(none)"}\n\nRecent commits (task code they mention):\n${commitText}` }],
     });
     if (res.stop_reason === "refusal") throw new DomainError("conflict", "Claude declined to review this material");
     if (!res.parsed_output) throw new DomainError("conflict", "Claude's answer could not be read; try again");

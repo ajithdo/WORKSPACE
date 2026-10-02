@@ -61,7 +61,7 @@ export default async function AssistantPage({ params }: { params: Promise<{ id: 
               <SubmitButton variant="secondary">Run site check</SubmitButton>
             </ActionForm>
           </Section>
-          <Section title="What did we finish?" description="After a build session, Claude reads the site and your notes and lists tasks that look done.">
+          <Section title="What did we finish?" description="After a build session, Claude reads the site, your notes and the last two weeks of commits, and lists tasks that look done.">
             <ActionForm action={completionCheckAction.bind(null, projectId)} className="space-y-2">
               <input className="field-input" name="url" defaultValue={defaultUrl} placeholder="https://staging.example.com" aria-label="Site address" />
               <Field label="Build notes" hint="Paste your AI coding tool's final summary, commit list or PR description. No secrets.">
