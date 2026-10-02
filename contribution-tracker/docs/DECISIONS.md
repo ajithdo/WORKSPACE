@@ -51,7 +51,13 @@ The spec (`docs/spec/contribution-app-spec.md`) is followed as written. This fil
 9. **Calibration report.** Planned vs verified points and hours per point by category across projects. Categories more than 30% off are flagged for the quarterly BO-02 review.
 10. **Snapshot re-verification.** Any locked snapshot can be recomputed from its stored inputs and parameters, and the hash compared.
 11. **Time log.** Minutes per task per member feed the hours-per-point report and the D17 trigger. Time never affects pay directly.
+12. **Site preview.** Each project stores its local, staging and live addresses. The Preview tab embeds the site (sandboxed frame) at phone, tablet and desktop widths. It is loaded by the partner's own browser, so `localhost` works.
+13. **Automated site check.** Free and needs no API key. It fetches the staging or live site and checks HTTPS, the redirect, mixed content, security headers, SEO basics, sitemap and robots.txt, structured data, Open Graph, analytics, `lang`, alt text, the privacy policy link and the 404 page. Each finding names its library task code. Server fetches refuse loopback, link-local and multicast addresses, re-check every redirect, and are size- and time-limited.
+14. **"What did we finish?" (Claude).** After a build session, Claude reads the site check and the partner's notes and lists the open tasks that look done, with confidence and reasons. Accepting a suggestion adds evidence and submits the task in the accepting partner's name. It **never verifies**: the other partner still checks it (principle 3). Every AI report is stored with its model and inputs.
+15. **Niche research (Claude with web search).** Claude searches for the best sites in the client's niche and location and suggests what to add or improve. Each suggestion is mapped to a library task, or proposed as a new task (which goes through normal proposal approval). Sources are kept, and the research can be saved as evidence (for example for discovery task I-02).
+
+AI features are optional and switched on only by `ANTHROPIC_API_KEY` in the server's `.env`. Without a key, everything except features 14 and 15 works.
 
 ## Screens
 
-`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.
+`/` inbox · `/projects` · `/projects/new` · `/projects/[id]` overview + milestones · `…/plan` · `…/board` · `…/tasks/[taskId]` · `…/communications` · `…/changes` · `…/finance` · `…/handover` · `…/contribution` · `…/disputes` · `…/files` · `…/closure` · `…/statement/[snapshotId]` · `…/preview` · `…/assistant` · `/library` · `/settings` · `/audit` · `/login` · `/setup`.
