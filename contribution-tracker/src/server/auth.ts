@@ -177,6 +177,22 @@ export function changePassword(ctx: Ctx, input: { current: string; next: string 
   });
 }
 
+/**
+ * Server-side recovery for a forgotten password (there is no email). Sets a one-time password the
+ * member must change after signing in, and signs them out everywhere.
+ */
+export function resetPassword(db: AppDb, now: Date, email: string): { name: string; temporaryPassword: string } {
+  const m = db.select().from(members).where(eq(members.email, normEmail(email))).get();
+  if (!m) throw new DomainError("not_found", `No member with email ${email}`);
+  const temporaryPassword = randomBytes(12).toString("base64url");
+  db.transaction((tx) => {
+    tx.update(members).set({ passwordHash: hashPassword(temporaryPassword), mustChangePassword: true }).where(eq(members.id, m.id)).run();
+    tx.delete(sessions).where(eq(sessions.memberId, m.id)).run();
+    appendAudit(tx, { at: iso(now), actorMemberId: null, action: "member.password_reset", entityType: "member", entityId: m.id });
+  });
+  return { name: m.name, temporaryPassword };
+}
+
 export function addMember(ctx: Ctx, input: { name: string; email: string; password: string; roles: string[] }): { memberId: number } {
   const actor = requireActor(ctx);
   const email = normEmail(input.email);

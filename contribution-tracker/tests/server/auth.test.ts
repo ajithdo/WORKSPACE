@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addMember, changePassword, login, logout, memberForSession, setupStudio } from "@/server/auth";
+import { addMember, changePassword, login, logout, memberForSession, resetPassword, setupStudio } from "@/server/auth";
 import { ctxFor, T0, testDb } from "../helpers";
 
 const later = (ms: number) => new Date(T0.getTime() + ms);
@@ -61,5 +61,22 @@ describe("setup and login", () => {
     const { db, a } = setup();
     addMember(ctxFor(db, a), { name: "Chitra", email: "chitra@studio.test", password: "temporary password 1", roles: ["QA"] });
     expect(() => addMember(ctxFor(db, a), { name: "Dup", email: "CHITRA@studio.test", password: "temporary password 1", roles: [] })).toThrow(/already/);
+  });
+});
+
+describe("password reset", () => {
+  it("signs the member out, issues a one-time password and asks for a change", () => {
+    const { db, a } = setup();
+    const s = login(db, T0, { email: "asha@studio.test", password: "correct horse battery", ip: "1.1.1.9" });
+    const { temporaryPassword } = resetPassword(db, T0, "Asha@Studio.test");
+    expect(memberForSession(db, later(1000), s.token)).toBeNull();
+    expect(() => login(db, later(2000), { email: "asha@studio.test", password: "correct horse battery", ip: "1.1.1.9" })).toThrow(/Wrong email or password/);
+    const s2 = login(db, later(3000), { email: "asha@studio.test", password: temporaryPassword, ip: "1.1.1.9" });
+    expect(memberForSession(db, later(4000), s2.token)?.mustChangePassword).toBe(true);
+    expect(memberForSession(db, later(4000), s2.token)?.id).toBe(a);
+  });
+  it("fails for an unknown email", () => {
+    const { db } = setup();
+    expect(() => resetPassword(db, T0, "nobody@studio.test")).toThrow(/No member/);
   });
 });

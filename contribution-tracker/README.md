@@ -47,6 +47,7 @@ Sign in as `asha@studio.test` / `demo password one`, or as `bala@studio.test` / 
 | Database copy (safe while running) and JSON export | Settings → Backups, or `DATA_DIR=… npm run backup [-- dest]` |
 | Uploaded evidence | Copy `DATA_DIR/files`. Files are never changed or deleted, only added. |
 | Audit chain check | Audit log → "Check integrity", or `DATA_DIR=… npm run verify:audit` (non-zero exit if tampered) |
+| Forgotten password | `DATA_DIR=… npm run reset-password -- partner@example.com` prints a one-time password and signs that partner out everywhere. They are asked to choose a new password after signing in. |
 
 The `npm run` scripts need the source checkout. With Docker, run them on the host and point `DATA_DIR` at `./data`, or use the Settings page.
 

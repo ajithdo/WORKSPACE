@@ -240,7 +240,7 @@ export default async function SettingsPage() {
             </div>
           </ActionForm>
         </details>
-        <details className="mt-3">
+        <details id="password" className="mt-3" open={me.mustChangePassword}>
           <summary className="cursor-pointer font-semibold text-royal">Change my password</summary>
           <ActionForm action={changePasswordAction} className="mt-2 grid max-w-sm gap-2" resetOnSuccess>
             <input className="field-input" type="password" name="current" placeholder="Current password" required autoComplete="current-password" aria-label="Current password" />

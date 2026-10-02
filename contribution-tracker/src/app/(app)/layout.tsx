@@ -42,6 +42,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
       <main className="min-w-0 px-3 py-4 md:px-8 md:py-8">
+        {member.mustChangePassword ? (
+          <p role="alert" className="mx-auto mb-3 max-w-6xl rounded-md border border-ledger/40 bg-ledger/5 px-4 py-2 text-sm">
+            You signed in with a temporary password. <a href="/settings#password" className="font-semibold text-royal underline">Choose your own password</a> before you continue.
+          </p>
+        ) : null}
         <div className="ledger-page mx-auto min-h-[calc(100dvh-4rem)] max-w-6xl rounded-lg border border-rule py-6 pr-4 shadow-sm md:py-8 md:pr-8">{children}</div>
       </main>
     </div>
