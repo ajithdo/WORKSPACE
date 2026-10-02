@@ -1,0 +1,54 @@
+name: contribution-tracker
+
+on:
+  pull_request:
+    paths: ["contribution-tracker/**", ".github/workflows/contribution-tracker.yml"]
+  push:
+    branches: [main]
+    paths: ["contribution-tracker/**", ".github/workflows/contribution-tracker.yml"]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: contribution-tracker
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: contribution-tracker/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: contribution-tracker/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: contribution-tracker/test-results
+          retention-days: 7
