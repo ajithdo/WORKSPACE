@@ -1,0 +1,92 @@
+name: contribution-tracker
+
+on:
+  pull_request:
+    paths: ["contribution-tracker/**", ".github/workflows/contribution-tracker.yml"]
+  push:
+    branches: [main]
+    paths: ["contribution-tracker/**", ".github/workflows/contribution-tracker.yml"]
+
+permissions:
+  contents: read
+
+# A newer push to the same branch makes the running checks obsolete.
+concurrency:
+  group: contribution-tracker-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: contribution-tracker
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: contribution-tracker/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: contribution-tracker/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - name: Same flow against the production build
+        run: npm run build && E2E_PROD=1 E2E_PORT=3300 npm run test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: contribution-tracker/test-results
+          retention-days: 7
+
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: contribution-tracker/package-lock.json
+      - run: docker build -t contribution-tracker .
+      - name: Start the container and wait for /health
+        run: |
+          # Like docker compose: the data folder does not exist yet, so Docker creates it as root.
+          docker run -d --name ct -p 3000:3000 -v "$RUNNER_TEMP/data:/data" contribution-tracker
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:3000/health; then echo; break; fi
+            sleep 2
+          done
+          curl -fsS http://localhost:3000/health
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/)" = "307"
+          ls "$RUNNER_TEMP/data"
+          test -f "$RUNNER_TEMP/data/app.db"
+      - name: Browser flow against the container
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          E2E_BASE_URL=http://localhost:3000 npm run test:e2e
+      - if: failure()
+        run: docker logs ct || true
